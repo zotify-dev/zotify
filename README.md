@@ -42,15 +42,15 @@ Different usage modes:
   
 Extra command line options:
   -ns, --no-splash     Suppress the splash screen when loading.
-  --config-location    Use a different zs_config.json, defaults to the one in the program directory
+  --config-location    Use a different zconfig.json, defaults to the one in the program directory
 ```
 
 ### Options:
 
-All these options can either be configured in the zs_config or via the commandline, in case of both the commandline-option has higher priority.  
+All these options can either be configured in the zconfig or via the commandline, in case of both the commandline-option has higher priority.  
 Be aware you have to set boolean values in the commandline like this: `--download-real-time=True`
 
-| Key (zs-config)              | commandline parameter            | Description
+| Key (zconfig)                | commandline parameter            | Description
 |------------------------------|----------------------------------|---------------------------------------------------------------------|
 | ROOT_PATH                    | --root-path                      | directory where Zotify saves the music
 | ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves the podcasts
