@@ -10,23 +10,23 @@ from podcast import download_episode, get_show_episodes
 from termoutput import Printer, PrintChannel
 from track import download_track, get_saved_tracks
 from utils import splash, split_input, regex_input_for_urls
-from zspotify import ZSpotify
+from zotify import Zotify
 
 SEARCH_URL = 'https://api.spotify.com/v1/search'
 
 
 def client(args) -> None:
-    """ Connects to spotify to perform query's and get songs to download """
-    ZSpotify(args)
+    """ Connects to download server to perform query's and get songs to download """
+    Zotify(args)
 
     Printer.print(PrintChannel.SPLASH, splash())
 
-    if ZSpotify.check_premium():
+    if Zotify.check_premium():
         Printer.print(PrintChannel.SPLASH, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n\n')
-        ZSpotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
+        Zotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
     else:
         Printer.print(PrintChannel.SPLASH, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n\n')
-        ZSpotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
+        Zotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
 
     if args.download:
         urls = []
@@ -49,7 +49,7 @@ def client(args) -> None:
     if args.liked_songs:
         for song in get_saved_tracks():
             if not song[TRACK][NAME] or not song[TRACK][ID]:
-                Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ON SPOTIFY ANYMORE   ###' + "\n")
+                Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
             else:
                 download_track('liked', song[TRACK][ID])
 
@@ -62,7 +62,7 @@ def client(args) -> None:
             search(search_text)
 
 def download_from_urls(urls: list[str]) -> bool:
-    """ Downloads from a list of spotify urls """
+    """ Downloads from a list of urls """
     download = False
 
     for spotify_url in urls:
@@ -86,7 +86,7 @@ def download_from_urls(urls: list[str]) -> bool:
             char_num = len(str(len(playlist_songs)))
             for song in playlist_songs:
                 if not song[TRACK][NAME] or not song[TRACK][ID]:
-                    Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ON SPOTIFY ANYMORE   ###' + "\n")
+                    Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                 else:
                     download_track('playlist', song[TRACK][ID], extra_keys=
                     {
@@ -109,7 +109,7 @@ def download_from_urls(urls: list[str]) -> bool:
 
 
 def search(search_term):
-    """ Searches Spotify's API for relevant data """
+    """ Searches download server's API for relevant data """
     params = {'limit': '10',
               'offset': '0',
               'q': search_term,
@@ -163,7 +163,7 @@ def search(search_term):
         raise ValueError("Invalid query.")
     params["q"] = ' '.join(search_term_list)
 
-    resp = ZSpotify.invoke_url_with_params(SEARCH_URL, **params)
+    resp = Zotify.invoke_url_with_params(SEARCH_URL, **params)
 
     counter = 1
     dics = []
