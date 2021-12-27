@@ -6,7 +6,7 @@
   <img src="https://i.imgur.com/hGXQWSl.png">
 </p>
 
-
+[Discord Server](https://discord.gg/Vwr4R2UUvD) - [Matrix Server](https://matrix.to/#/#zotify-community:matrix.org) - [NotABug Mirror](https://notabug.org/Zotify/zotify)
 
 ```
 Requirements:
