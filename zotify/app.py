@@ -4,7 +4,7 @@ import os
 
 from album import download_album, download_artist_albums
 from const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
-    OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME
+    OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME, TYPE
 from playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
 from podcast import download_episode, get_show_episodes
 from termoutput import Printer, PrintChannel
@@ -88,14 +88,17 @@ def download_from_urls(urls: list[str]) -> bool:
                 if not song[TRACK][NAME] or not song[TRACK][ID]:
                     Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                 else:
-                    download_track('playlist', song[TRACK][ID], extra_keys=
-                    {
-                        'playlist_song_name': song[TRACK][NAME],
-                        'playlist': name,
-                        'playlist_num': str(enum).zfill(char_num),
-                        'playlist_id': playlist_id,
-                        'playlist_track_id': song[TRACK][ID]
-                    })
+                    if song[TRACK][TYPE] == "episode": # Playlist item is a podcast episode
+                        download_episode(song[TRACK][ID])
+                    else:
+                        download_track('playlist', song[TRACK][ID], extra_keys=
+                        {
+                            'playlist_song_name': song[TRACK][NAME],
+                            'playlist': name,
+                            'playlist_num': str(enum).zfill(char_num),
+                            'playlist_id': playlist_id,
+                            'playlist_track_id': song[TRACK][ID]
+                        })
                     enum += 1
         elif episode_id is not None:
             download = True
