@@ -1,16 +1,17 @@
 from librespot.audio.decoders import AudioQuality
 from tabulate import tabulate
-import os
+#import os
+from pathlib import Path
 
-from album import download_album, download_artist_albums
-from const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
-    OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME
-from playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
-from podcast import download_episode, get_show_episodes
-from termoutput import Printer, PrintChannel
-from track import download_track, get_saved_tracks
-from utils import splash, split_input, regex_input_for_urls
-from zotify import Zotify
+from zotify.album import download_album, download_artist_albums
+from zotify.const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
+    OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME, TYPE
+from zotify.playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
+from zotify.podcast import download_episode, get_show_episodes
+from zotify.termoutput import Printer, PrintChannel
+from zotify.track import download_track, get_saved_tracks
+from zotify.utils import splash, split_input, regex_input_for_urls
+from zotify.zotify import Zotify
 
 SEARCH_URL = 'https://api.spotify.com/v1/search'
 
@@ -31,7 +32,7 @@ def client(args) -> None:
     if args.download:
         urls = []
         filename = args.download
-        if os.path.exists(filename):
+        if Path(filename).exists():
             with open(filename, 'r', encoding='utf-8') as file:
                 urls.extend([line.strip() for line in file.readlines()])
 
@@ -88,14 +89,17 @@ def download_from_urls(urls: list[str]) -> bool:
                 if not song[TRACK][NAME] or not song[TRACK][ID]:
                     Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                 else:
-                    download_track('playlist', song[TRACK][ID], extra_keys=
-                    {
-                        'playlist_song_name': song[TRACK][NAME],
-                        'playlist': name,
-                        'playlist_num': str(enum).zfill(char_num),
-                        'playlist_id': playlist_id,
-                        'playlist_track_id': song[TRACK][ID]
-                    })
+                    if song[TRACK][TYPE] == "episode": # Playlist item is a podcast episode
+                        download_episode(song[TRACK][ID])
+                    else:
+                        download_track('playlist', song[TRACK][ID], extra_keys=
+                        {
+                            'playlist_song_name': song[TRACK][NAME],
+                            'playlist': name,
+                            'playlist_num': str(enum).zfill(char_num),
+                            'playlist_id': playlist_id,
+                            'playlist_track_id': song[TRACK][ID]
+                        })
                     enum += 1
         elif episode_id is not None:
             download = True

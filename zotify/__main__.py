@@ -7,10 +7,10 @@ It's like youtube-dl, but for that other music platform.
 
 import argparse
 
-from app import client
-from config import CONFIG_VALUES
+from zotify.app import client
+from zotify.config import CONFIG_VALUES
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(prog='zotify',
         description='A music and podcast downloader needing only a python interpreter and ffmpeg.')
     parser.add_argument('-ns', '--no-splash',
@@ -51,3 +51,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
+
+if __name__ == '__main__':
+    main()

@@ -2,8 +2,8 @@ import sys
 from enum import Enum
 from tqdm import tqdm
 
-from config import *
-from zotify import Zotify
+from zotify.config import *
+from zotify.zotify import Zotify
 
 
 class PrintChannel(Enum):

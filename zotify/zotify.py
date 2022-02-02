@@ -1,15 +1,16 @@
 import os
 import os.path
+from pathlib import Path
 from getpass import getpass
 import time
 import requests
 from librespot.audio.decoders import VorbisOnlyAudioQuality
 from librespot.core import Session
 
-from const import TYPE, \
+from zotify.const import TYPE, \
     PREMIUM, USER_READ_EMAIL, OFFSET, LIMIT, \
     PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ
-from config import Config
+from zotify.config import Config
 
 class Zotify:    
     SESSION: Session = None
@@ -26,7 +27,7 @@ class Zotify:
 
         cred_location = Config.get_credentials_location()
 
-        if os.path.isfile(cred_location):
+        if Path(cred_location).is_file():
             try:
                 cls.SESSION = Session.Builder().stored_file(cred_location).create()
                 return
@@ -75,7 +76,7 @@ class Zotify:
     @classmethod
     def invoke_url(cls, url, tryCount=0):
         # we need to import that here, otherwise we will get circular imports!
-        from termoutput import Printer, PrintChannel
+        from zotify.termoutput import Printer, PrintChannel
         headers = cls.get_auth_header()
         response = requests.get(url, headers=headers)
         responsetext = response.text

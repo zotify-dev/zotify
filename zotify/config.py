@@ -1,8 +1,9 @@
 import json
-import os
+# import os
+from pathlib import Path, PurePath
 from typing import Any
 
-CONFIG_FILE_PATH = '../zconfig.json'
+CONFIG_FILE_PATH = './zconfig.json'
 
 ROOT_PATH = 'ROOT_PATH'
 ROOT_PODCAST_PATH = 'ROOT_PODCAST_PATH'
@@ -34,34 +35,34 @@ PRINT_WARNINGS = 'PRINT_WARNINGS'
 RETRY_ATTEMPTS = 'RETRY_ATTEMPTS'
 
 CONFIG_VALUES = {
-    ROOT_PATH:                  { 'default': '../Zotify Music/',    'type': str,  'arg': '--root-path'                  },
-    ROOT_PODCAST_PATH:          { 'default': '../Zotify Podcasts/', 'type': str,  'arg': '--root-podcast-path'          },
-    SKIP_EXISTING_FILES:        { 'default': 'True',                'type': bool, 'arg': '--skip-existing-files'        },
-    SKIP_PREVIOUSLY_DOWNLOADED: { 'default': 'False',               'type': bool, 'arg': '--skip-previously-downloaded' },
-    RETRY_ATTEMPTS:             { 'default': '5',                   'type': int,  'arg': '--retry-attemps'              },
-    DOWNLOAD_FORMAT:            { 'default': 'ogg',                 'type': str,  'arg': '--download-format'            },
-    FORCE_PREMIUM:              { 'default': 'False',               'type': bool, 'arg': '--force-premium'              },
-    ANTI_BAN_WAIT_TIME:         { 'default': '1',                   'type': int,  'arg': '--anti-ban-wait-time'         },
-    OVERRIDE_AUTO_WAIT:         { 'default': 'False',               'type': bool, 'arg': '--override-auto-wait'         },
-    CHUNK_SIZE:                 { 'default': '50000',               'type': int,  'arg': '--chunk-size'                 },
-    SPLIT_ALBUM_DISCS:          { 'default': 'False',               'type': bool, 'arg': '--split-album-discs'          },
-    DOWNLOAD_REAL_TIME:         { 'default': 'False',               'type': bool, 'arg': '--download-real-time'         },
-    LANGUAGE:                   { 'default': 'en',                  'type': str,  'arg': '--language'                   },
-    BITRATE:                    { 'default': '',                    'type': str,  'arg': '--bitrate'                    },
-    SONG_ARCHIVE:               { 'default': '.song_archive',       'type': str,  'arg': '--song-archive'               },
-    CREDENTIALS_LOCATION:       { 'default': 'credentials.json',    'type': str,  'arg': '--credentials-location'       },
-    OUTPUT:                     { 'default': '',                    'type': str,  'arg': '--output'                     },
-    PRINT_SPLASH:               { 'default': 'False',               'type': bool, 'arg': '--print-splash'               },
-    PRINT_SKIPS:                { 'default': 'True',                'type': bool, 'arg': '--print-skips'                },
-    PRINT_DOWNLOAD_PROGRESS:    { 'default': 'True',                'type': bool, 'arg': '--print-download-progress'    },
-    PRINT_ERRORS:               { 'default': 'True',                'type': bool, 'arg': '--print-errors'               },
-    PRINT_DOWNLOADS:            { 'default': 'False',               'type': bool, 'arg': '--print-downloads'            },
-    PRINT_API_ERRORS:           { 'default': 'False',               'type': bool, 'arg': '--print-api-errors'           },
-    PRINT_PROGRESS_INFO:        { 'default': 'True',                'type': bool, 'arg': '--print-progress-info'        },
-    PRINT_WARNINGS:             { 'default': 'True',                'type': bool, 'arg': '--print-warnings'             },
-    MD_ALLGENRES:               { 'default': 'False',               'type': bool, 'arg': '--md-allgenres'               },
-    MD_GENREDELIMITER:          { 'default': ';',                   'type': str,  'arg': '--md-genredelimiter'          },
-    TEMP_DOWNLOAD_DIR:          { 'default': '',                    'type': str,  'arg': '--temp-download-dir'          }
+    ROOT_PATH:                  { 'default': './Zotify Music/',    'type': str,  'arg': '--root-path'                  },
+    ROOT_PODCAST_PATH:          { 'default': './Zotify Podcasts/', 'type': str,  'arg': '--root-podcast-path'          },
+    SKIP_EXISTING_FILES:        { 'default': 'True',               'type': bool, 'arg': '--skip-existing-files'        },
+    SKIP_PREVIOUSLY_DOWNLOADED: { 'default': 'False',              'type': bool, 'arg': '--skip-previously-downloaded' },
+    RETRY_ATTEMPTS:             { 'default': '5',                  'type': int,  'arg': '--retry-attemps'              },
+    DOWNLOAD_FORMAT:            { 'default': 'ogg',                'type': str,  'arg': '--download-format'            },
+    FORCE_PREMIUM:              { 'default': 'False',              'type': bool, 'arg': '--force-premium'              },
+    ANTI_BAN_WAIT_TIME:         { 'default': '1',                  'type': int,  'arg': '--anti-ban-wait-time'         },
+    OVERRIDE_AUTO_WAIT:         { 'default': 'False',              'type': bool, 'arg': '--override-auto-wait'         },
+    CHUNK_SIZE:                 { 'default': '50000',              'type': int,  'arg': '--chunk-size'                 },
+    SPLIT_ALBUM_DISCS:          { 'default': 'False',              'type': bool, 'arg': '--split-album-discs'          },
+    DOWNLOAD_REAL_TIME:         { 'default': 'False',              'type': bool, 'arg': '--download-real-time'         },
+    LANGUAGE:                   { 'default': 'en',                 'type': str,  'arg': '--language'                   },
+    BITRATE:                    { 'default': '',                   'type': str,  'arg': '--bitrate'                    },
+    SONG_ARCHIVE:               { 'default': '.song_archive',      'type': str,  'arg': '--song-archive'               },
+    CREDENTIALS_LOCATION:       { 'default': 'credentials.json',   'type': str,  'arg': '--credentials-location'       },
+    OUTPUT:                     { 'default': '',                   'type': str,  'arg': '--output'                     },
+    PRINT_SPLASH:               { 'default': 'False',              'type': bool, 'arg': '--print-splash'               },
+    PRINT_SKIPS:                { 'default': 'True',               'type': bool, 'arg': '--print-skips'                },
+    PRINT_DOWNLOAD_PROGRESS:    { 'default': 'True',               'type': bool, 'arg': '--print-download-progress'    },
+    PRINT_ERRORS:               { 'default': 'True',               'type': bool, 'arg': '--print-errors'               },
+    PRINT_DOWNLOADS:            { 'default': 'False',              'type': bool, 'arg': '--print-downloads'            },
+    PRINT_API_ERRORS:           { 'default': 'False',              'type': bool, 'arg': '--print-api-errors'           },
+    PRINT_PROGRESS_INFO:        { 'default': 'True',               'type': bool, 'arg': '--print-progress-info'        },
+    PRINT_WARNINGS:             { 'default': 'True',               'type': bool, 'arg': '--print-warnings'             },
+    MD_ALLGENRES:               { 'default': 'False',              'type': bool, 'arg': '--md-allgenres'               },
+    MD_GENREDELIMITER:          { 'default': ';',                  'type': str,  'arg': '--md-genredelimiter'          },
+    TEMP_DOWNLOAD_DIR:          { 'default': '',                   'type': str,  'arg': '--temp-download-dir'          }
 }
 
 OUTPUT_DEFAULT_PLAYLIST = '{playlist}/{artist} - {song_name}.{ext}'
@@ -76,17 +77,18 @@ class Config:
 
     @classmethod
     def load(cls, args) -> None:
-        app_dir = os.path.dirname(__file__)
+        #app_dir = PurePath(__file__).parent
+        app_dir = Path.cwd()
 
         config_fp = CONFIG_FILE_PATH
         if args.config_location:
             config_fp = args.config_location
 
-        true_config_file_path = os.path.join(app_dir, config_fp)
+        true_config_file_path = PurePath(app_dir).joinpath(config_fp)
 
         # Load config from zconfig.json
 
-        if not os.path.exists(true_config_file_path):
+        if not Path(true_config_file_path).exists():
             with open(true_config_file_path, 'w', encoding='utf-8') as config_file:
                 json.dump(cls.get_default_json(), config_file, indent=4)
             cls.Values = cls.get_default_json()
@@ -142,11 +144,11 @@ class Config:
 
     @classmethod
     def get_root_path(cls) -> str:
-        return os.path.join(os.path.dirname(__file__), cls.get(ROOT_PATH))
+        return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PATH))
 
     @classmethod
     def get_root_podcast_path(cls) -> str:
-        return os.path.join(os.path.dirname(__file__), cls.get(ROOT_PODCAST_PATH))
+        return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PODCAST_PATH))
 
     @classmethod
     def get_skip_existing_files(cls) -> bool:
@@ -194,17 +196,17 @@ class Config:
 
     @classmethod
     def get_song_archive(cls) -> str:
-        return os.path.join(cls.get_root_path(), cls.get(SONG_ARCHIVE))
+        return PurePath(cls.get_root_path()).joinpath(cls.get(SONG_ARCHIVE))
 
     @classmethod
     def get_credentials_location(cls) -> str:
-        return os.path.join(os.getcwd(), cls.get(CREDENTIALS_LOCATION))
+        return PurePath(Path.cwd()).joinpath(cls.get(CREDENTIALS_LOCATION))
 
     @classmethod
     def get_temp_download_dir(cls) -> str:
         if cls.get(TEMP_DOWNLOAD_DIR) == '':
             return ''
-        return os.path.join(cls.get_root_path(), cls.get(TEMP_DOWNLOAD_DIR))
+        return PurePath(cls.get_root_path()).joinpath(cls.get(TEMP_DOWNLOAD_DIR))
     
     @classmethod
     def get_all_genres(cls) -> bool:
@@ -221,28 +223,38 @@ class Config:
             return v
         if mode == 'playlist':
             if cls.get_split_album_discs():
-                split = os.path.split(OUTPUT_DEFAULT_PLAYLIST)
-                return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                # split = os.path.split(OUTPUT_DEFAULT_PLAYLIST)
+                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                split = PurePath(OUTPUT_DEFAULT_PLAYLIST).parent
+                return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_PLAYLIST
         if mode == 'extplaylist':
             if cls.get_split_album_discs():
-                split = os.path.split(OUTPUT_DEFAULT_PLAYLIST_EXT)
-                return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                # split = os.path.split(OUTPUT_DEFAULT_PLAYLIST_EXT)
+                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                split = PurePath(OUTPUT_DEFAULT_PLAYLIST_EXT).parent
+                return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_PLAYLIST_EXT
         if mode == 'liked':
             if cls.get_split_album_discs():
-                split = os.path.split(OUTPUT_DEFAULT_LIKED_SONGS)
-                return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                # split = os.path.split(OUTPUT_DEFAULT_LIKED_SONGS)
+                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                split = PurePath(OUTPUT_DEFAULT_LIKED_SONGS).parent
+                return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_LIKED_SONGS
         if mode == 'single':
             if cls.get_split_album_discs():
-                split = os.path.split(OUTPUT_DEFAULT_SINGLE)
-                return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                # split = os.path.split(OUTPUT_DEFAULT_SINGLE)
+                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                split = PurePath(OUTPUT_DEFAULT_SINGLE).parent
+                return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_SINGLE
         if mode == 'album':
             if cls.get_split_album_discs():
-                split = os.path.split(OUTPUT_DEFAULT_ALBUM)
-                return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                # split = os.path.split(OUTPUT_DEFAULT_ALBUM)
+                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
+                split = PurePath(OUTPUT_DEFAULT_ALBUM).parent
+                return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_ALBUM
         raise ValueError()
 
