@@ -31,7 +31,7 @@ Python packages:
 
 ```
 Basic command line usage:
-  python zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
+  zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
 
 Different usage modes:
   (nothing)            Download the tracks/alumbs/playlists URLs from the parameter
@@ -42,15 +42,15 @@ Different usage modes:
   
 Extra command line options:
   -ns, --no-splash     Suppress the splash screen when loading.
-  --config-location    Use a different zconfig.json, defaults to the one in the program directory
+  --config-location    Use a different config.json.
 ```
 
 ### Options:
 
-All these options can either be configured in the zconfig or via the commandline, in case of both the commandline-option has higher priority.  
+All these options can either be configured in the config or via the commandline, in case of both the commandline-option has higher priority.  
 Be aware you have to set boolean values in the commandline like this: `--download-real-time=True`
 
-| Key (zconfig)                | commandline parameter            | Description
+| Key (config)                 | commandline parameter            | Description
 |------------------------------|----------------------------------|---------------------------------------------------------------------|
 | ROOT_PATH                    | --root-path                      | directory where Zotify saves the music
 | ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves the podcasts
@@ -106,20 +106,20 @@ Liked Songs/{artist} - {song_name}.{ext}
 /home/user/downloads/{artist} - {song_name} [{id}].{ext}
 ~~~~
 
-### Docker Usage
+### Docker Usage - CURRENTLY BROKEN
 ```
 Build the docker image from the Dockerfile:
   docker build -t zotify .
 Create and run a container from the image:
-  docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/zconfig.json:/zconfig.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
+  docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/config.json:/config.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
 ```
 
 ### Will my account get banned if I use this tool?
 
 Currently no user has reported their account getting banned after using Zotify.
 
-We highly recommend using Zotify with a burner account.
-Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus not appearing suspicious.
+It is recommended you use Zotify with a burner account.
+Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus appearing less suspicious.
 This option is much slower and is only recommended for premium users who wish to download songs in 320kbps without buying premium on a burner account.
 
 **Use Zotify at your own risk**, the developers of Zotify are not responsible if your account gets banned.

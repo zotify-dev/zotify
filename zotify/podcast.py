@@ -7,7 +7,7 @@ from librespot.metadata import EpisodeId
 
 from zotify.const import ERROR, ID, ITEMS, NAME, SHOW, DURATION_MS
 from zotify.termoutput import PrintChannel, Printer
-from zotify.utils import create_download_directory, fix_filename
+from zotify.utils import create_download_directory, fix_filename, convert_audio_format
 from zotify.zotify import Zotify
 from zotify.loader import Loader
 

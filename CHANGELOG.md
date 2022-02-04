@@ -2,9 +2,14 @@
 ## v0.6
 **General changes**
 - Switched from os.path to pathlib
-- Zotify can now be installed with pip \
+- Zotify can now be installed with pip - 
 `pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip`
-- Zotify can be ran from any directory with `zotify <args>`, you no longer need to prefix `python` in the command.
+- Zotify can be ran from any directory with `zotify [args]`, you no longer need to prefix `python` in the command.
+- New default config locations:
+  - Windows: `%AppData%\Roaming\Zotify\config.json`
+  - Linux: `~/.config/zotify/config.json`
+  - macOS: `~/Library/Application Support/Zotify/config.json`
+  - You can still use `--config-location` to specify a local config file.
 
 **Docker**
 - Dockerfile is currently broken, it will be fixed soon. \

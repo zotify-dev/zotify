@@ -1,9 +1,8 @@
 import json
-# import os
+import sys
 from pathlib import Path, PurePath
 from typing import Any
 
-CONFIG_FILE_PATH = './zconfig.json'
 
 ROOT_PATH = 'ROOT_PATH'
 ROOT_PODCAST_PATH = 'ROOT_PODCAST_PATH'
@@ -77,28 +76,28 @@ class Config:
 
     @classmethod
     def load(cls, args) -> None:
-        #app_dir = PurePath(__file__).parent
-        app_dir = Path.cwd()
-
-        config_fp = CONFIG_FILE_PATH
+        system_paths = {
+            'win32': Path.home() / 'AppData/Roaming/Zotify',
+            'linux': Path.home() / '.config/zotify',
+            'darwin': Path.home() / 'Library/Application Support/Zotify'
+        }
+        config_fp = system_paths[sys.platform] / 'config.json'
         if args.config_location:
             config_fp = args.config_location
 
-        true_config_file_path = PurePath(app_dir).joinpath(config_fp)
+        true_config_file_path = Path(config_fp).expanduser()
 
         # Load config from zconfig.json
-
+        Path(PurePath(true_config_file_path).parent).mkdir(parents=True, exist_ok=True)
         if not Path(true_config_file_path).exists():
             with open(true_config_file_path, 'w', encoding='utf-8') as config_file:
                 json.dump(cls.get_default_json(), config_file, indent=4)
-            cls.Values = cls.get_default_json()
-        else:
-            with open(true_config_file_path, encoding='utf-8') as config_file:
-                jsonvalues = json.load(config_file)
-                cls.Values = {}
-                for key in CONFIG_VALUES:
-                    if key in jsonvalues:
-                        cls.Values[key] = cls.parse_arg_value(key, jsonvalues[key])
+        with open(true_config_file_path, encoding='utf-8') as config_file:
+            jsonvalues = json.load(config_file)
+            cls.Values = {}
+            for key in CONFIG_VALUES:
+                if key in jsonvalues:
+                    cls.Values[key] = cls.parse_arg_value(key, jsonvalues[key])
 
         # Add default values for missing keys
 
@@ -144,11 +143,13 @@ class Config:
 
     @classmethod
     def get_root_path(cls) -> str:
-        return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PATH))
+        # return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PATH))
+        return PurePath(Path(cls.get(ROOT_PATH)).expanduser())
 
     @classmethod
     def get_root_podcast_path(cls) -> str:
-        return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PODCAST_PATH))
+        # return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PODCAST_PATH))
+        return PurePath(Path(cls.get(ROOT_PODCAST_PATH)).expanduser())
 
     @classmethod
     def get_skip_existing_files(cls) -> bool:
@@ -223,36 +224,26 @@ class Config:
             return v
         if mode == 'playlist':
             if cls.get_split_album_discs():
-                # split = os.path.split(OUTPUT_DEFAULT_PLAYLIST)
-                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
                 split = PurePath(OUTPUT_DEFAULT_PLAYLIST).parent
                 return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_PLAYLIST
         if mode == 'extplaylist':
             if cls.get_split_album_discs():
-                # split = os.path.split(OUTPUT_DEFAULT_PLAYLIST_EXT)
-                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
                 split = PurePath(OUTPUT_DEFAULT_PLAYLIST_EXT).parent
                 return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_PLAYLIST_EXT
         if mode == 'liked':
             if cls.get_split_album_discs():
-                # split = os.path.split(OUTPUT_DEFAULT_LIKED_SONGS)
-                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
                 split = PurePath(OUTPUT_DEFAULT_LIKED_SONGS).parent
                 return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_LIKED_SONGS
         if mode == 'single':
             if cls.get_split_album_discs():
-                # split = os.path.split(OUTPUT_DEFAULT_SINGLE)
-                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
                 split = PurePath(OUTPUT_DEFAULT_SINGLE).parent
                 return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_SINGLE
         if mode == 'album':
             if cls.get_split_album_discs():
-                # split = os.path.split(OUTPUT_DEFAULT_ALBUM)
-                # return os.path.join(split[0], 'Disc {disc_number}', split[0])
                 split = PurePath(OUTPUT_DEFAULT_ALBUM).parent
                 return PurePath(split).joinpath('Disc {disc_number}').joinpath(split)
             return OUTPUT_DEFAULT_ALBUM

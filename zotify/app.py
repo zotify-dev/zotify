@@ -23,10 +23,10 @@ def client(args) -> None:
     Printer.print(PrintChannel.SPLASH, splash())
 
     if Zotify.check_premium():
-        Printer.print(PrintChannel.SPLASH, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n\n')
+        Printer.print(PrintChannel.WARNINGS, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n\n')
         Zotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
     else:
-        Printer.print(PrintChannel.SPLASH, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n\n')
+        Printer.print(PrintChannel.WARNINGS, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n\n')
         Zotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
 
     if args.download:
@@ -67,8 +67,7 @@ def download_from_urls(urls: list[str]) -> bool:
     download = False
 
     for spotify_url in urls:
-        track_id, album_id, playlist_id, episode_id, show_id, artist_id = regex_input_for_urls(
-            spotify_url)
+        track_id, album_id, playlist_id, episode_id, show_id, artist_id = regex_input_for_urls(spotify_url)
 
         if track_id is not None:
             download = True

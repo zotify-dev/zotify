@@ -23,7 +23,6 @@ class MusicFormat(str, Enum):
 
 def create_download_directory(download_path: str) -> None:
     """ Create directory and add a hidden file with song ids """
-    # os.makedirs(download_path, exist_ok=True)
     Path(download_path).mkdir(parents=True, exist_ok=True)
 
     # add hidden file with song ids
@@ -282,5 +281,3 @@ def fmt_seconds(secs: float) -> str:
         return f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
     else:
         return f'{h}'.zfill(2) + ':' + f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
-
-

@@ -18,7 +18,7 @@ def main():
                         help='Suppress the splash screen when loading.')
     parser.add_argument('--config-location',
                         type=str,
-                        help='Specify the zconfig.json location')
+                        help='Specify the json config location')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('urls',
                        type=str,
