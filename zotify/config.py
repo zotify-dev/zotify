@@ -17,7 +17,7 @@ SPLIT_ALBUM_DISCS = 'SPLIT_ALBUM_DISCS'
 DOWNLOAD_REAL_TIME = 'DOWNLOAD_REAL_TIME'
 LANGUAGE = 'LANGUAGE'
 BITRATE = 'BITRATE'
-SONG_ARCHIVE = 'SONG_ARCHIVE'
+TRACK_ARCHIVE = 'TRACK_ARCHIVE'
 CREDENTIALS_LOCATION = 'CREDENTIALS_LOCATION'
 OUTPUT = 'OUTPUT'
 PRINT_SPLASH = 'PRINT_SPLASH'
@@ -32,42 +32,43 @@ MD_GENREDELIMITER = 'MD_GENREDELIMITER'
 PRINT_PROGRESS_INFO = 'PRINT_PROGRESS_INFO'
 PRINT_WARNINGS = 'PRINT_WARNINGS'
 RETRY_ATTEMPTS = 'RETRY_ATTEMPTS'
+CONFIG_VERSION = 'CONFIG_VERSION'
 
 CONFIG_VALUES = {
-    ROOT_PATH:                  { 'default': './Zotify Music/',    'type': str,  'arg': '--root-path'                  },
-    ROOT_PODCAST_PATH:          { 'default': './Zotify Podcasts/', 'type': str,  'arg': '--root-podcast-path'          },
-    SKIP_EXISTING_FILES:        { 'default': 'True',               'type': bool, 'arg': '--skip-existing-files'        },
-    SKIP_PREVIOUSLY_DOWNLOADED: { 'default': 'False',              'type': bool, 'arg': '--skip-previously-downloaded' },
-    RETRY_ATTEMPTS:             { 'default': '5',                  'type': int,  'arg': '--retry-attemps'              },
-    DOWNLOAD_FORMAT:            { 'default': 'ogg',                'type': str,  'arg': '--download-format'            },
-    FORCE_PREMIUM:              { 'default': 'False',              'type': bool, 'arg': '--force-premium'              },
-    ANTI_BAN_WAIT_TIME:         { 'default': '1',                  'type': int,  'arg': '--anti-ban-wait-time'         },
-    OVERRIDE_AUTO_WAIT:         { 'default': 'False',              'type': bool, 'arg': '--override-auto-wait'         },
-    CHUNK_SIZE:                 { 'default': '50000',              'type': int,  'arg': '--chunk-size'                 },
-    SPLIT_ALBUM_DISCS:          { 'default': 'False',              'type': bool, 'arg': '--split-album-discs'          },
-    DOWNLOAD_REAL_TIME:         { 'default': 'False',              'type': bool, 'arg': '--download-real-time'         },
-    LANGUAGE:                   { 'default': 'en',                 'type': str,  'arg': '--language'                   },
-    BITRATE:                    { 'default': '',                   'type': str,  'arg': '--bitrate'                    },
-    SONG_ARCHIVE:               { 'default': '.song_archive',      'type': str,  'arg': '--song-archive'               },
-    CREDENTIALS_LOCATION:       { 'default': 'credentials.json',   'type': str,  'arg': '--credentials-location'       },
-    OUTPUT:                     { 'default': '',                   'type': str,  'arg': '--output'                     },
-    PRINT_SPLASH:               { 'default': 'False',              'type': bool, 'arg': '--print-splash'               },
-    PRINT_SKIPS:                { 'default': 'True',               'type': bool, 'arg': '--print-skips'                },
-    PRINT_DOWNLOAD_PROGRESS:    { 'default': 'True',               'type': bool, 'arg': '--print-download-progress'    },
-    PRINT_ERRORS:               { 'default': 'True',               'type': bool, 'arg': '--print-errors'               },
-    PRINT_DOWNLOADS:            { 'default': 'False',              'type': bool, 'arg': '--print-downloads'            },
-    PRINT_API_ERRORS:           { 'default': 'False',              'type': bool, 'arg': '--print-api-errors'           },
-    PRINT_PROGRESS_INFO:        { 'default': 'True',               'type': bool, 'arg': '--print-progress-info'        },
-    PRINT_WARNINGS:             { 'default': 'True',               'type': bool, 'arg': '--print-warnings'             },
-    MD_ALLGENRES:               { 'default': 'False',              'type': bool, 'arg': '--md-allgenres'               },
-    MD_GENREDELIMITER:          { 'default': ';',                  'type': str,  'arg': '--md-genredelimiter'          },
-    TEMP_DOWNLOAD_DIR:          { 'default': '',                   'type': str,  'arg': '--temp-download-dir'          }
+    ROOT_PATH:                  { 'default': '',      'type': str,  'arg': '--root-path'                  },
+    ROOT_PODCAST_PATH:          { 'default': '',      'type': str,  'arg': '--root-podcast-path'          },
+    SKIP_EXISTING_FILES:        { 'default': 'True',  'type': bool, 'arg': '--skip-existing-files'        },
+    SKIP_PREVIOUSLY_DOWNLOADED: { 'default': 'False', 'type': bool, 'arg': '--skip-previously-downloaded' },
+    RETRY_ATTEMPTS:             { 'default': '5',     'type': int,  'arg': '--retry-attemps'              },
+    DOWNLOAD_FORMAT:            { 'default': 'ogg',   'type': str,  'arg': '--download-format'            },
+    FORCE_PREMIUM:              { 'default': 'False', 'type': bool, 'arg': '--force-premium'              },
+    ANTI_BAN_WAIT_TIME:         { 'default': '1',     'type': int,  'arg': '--anti-ban-wait-time'         },
+    OVERRIDE_AUTO_WAIT:         { 'default': 'False', 'type': bool, 'arg': '--override-auto-wait'         },
+    CHUNK_SIZE:                 { 'default': '50000', 'type': int,  'arg': '--chunk-size'                 },
+    SPLIT_ALBUM_DISCS:          { 'default': 'False', 'type': bool, 'arg': '--split-album-discs'          },
+    DOWNLOAD_REAL_TIME:         { 'default': 'False', 'type': bool, 'arg': '--download-real-time'         },
+    LANGUAGE:                   { 'default': 'en',    'type': str,  'arg': '--language'                   },
+    BITRATE:                    { 'default': '',      'type': str,  'arg': '--bitrate'                    },
+    TRACK_ARCHIVE:              { 'default': '',      'type': str,  'arg': '--track-archive'              },
+    CREDENTIALS_LOCATION:       { 'default': '',      'type': str,  'arg': '--credentials-location'       },
+    OUTPUT:                     { 'default': '',      'type': str,  'arg': '--output'                     },
+    PRINT_SPLASH:               { 'default': 'False', 'type': bool, 'arg': '--print-splash'               },
+    PRINT_SKIPS:                { 'default': 'True',  'type': bool, 'arg': '--print-skips'                },
+    PRINT_DOWNLOAD_PROGRESS:    { 'default': 'True',  'type': bool, 'arg': '--print-download-progress'    },
+    PRINT_ERRORS:               { 'default': 'True',  'type': bool, 'arg': '--print-errors'               },
+    PRINT_DOWNLOADS:            { 'default': 'False', 'type': bool, 'arg': '--print-downloads'            },
+    PRINT_API_ERRORS:           { 'default': 'False', 'type': bool, 'arg': '--print-api-errors'           },
+    PRINT_PROGRESS_INFO:        { 'default': 'True',  'type': bool, 'arg': '--print-progress-info'        },
+    PRINT_WARNINGS:             { 'default': 'True',  'type': bool, 'arg': '--print-warnings'             },
+    MD_ALLGENRES:               { 'default': 'False', 'type': bool, 'arg': '--md-allgenres'               },
+    MD_GENREDELIMITER:          { 'default': ',',     'type': str,  'arg': '--md-genredelimiter'          },
+    TEMP_DOWNLOAD_DIR:          { 'default': '',      'type': str,  'arg': '--temp-download-dir'          }
 }
 
 OUTPUT_DEFAULT_PLAYLIST = '{playlist}/{artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_PLAYLIST_EXT = '{playlist}/{playlist_num} - {artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_LIKED_SONGS = 'Liked Songs/{artist} - {song_name}.{ext}'
-OUTPUT_DEFAULT_SINGLE = '{artist} - {song_name}.{ext}'
+OUTPUT_DEFAULT_SINGLE = '{artist} - {song_name}/{artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_ALBUM = '{artist}/{album}/{album_num} - {artist} - {song_name}.{ext}'
 
 
@@ -81,7 +82,10 @@ class Config:
             'linux': Path.home() / '.config/zotify',
             'darwin': Path.home() / 'Library/Application Support/Zotify'
         }
-        config_fp = system_paths[sys.platform] / 'config.json'
+        if sys.platform not in system_paths:
+            config_fp = Path.cwd() / '.zotify/config.json'
+        else:
+            config_fp = system_paths[sys.platform] / 'config.json'
         if args.config_location:
             config_fp = args.config_location
 
@@ -143,13 +147,21 @@ class Config:
 
     @classmethod
     def get_root_path(cls) -> str:
-        # return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PATH))
-        return PurePath(Path(cls.get(ROOT_PATH)).expanduser())
+        if cls.get(ROOT_PATH) == '':
+            root_path = PurePath(Path.home() / 'Music/Zotify Music/')
+        else:
+            root_path = PurePath(Path(cls.get(ROOT_PATH)).expanduser())
+        Path(root_path).mkdir(parents=True, exist_ok=True)
+        return root_path
 
     @classmethod
     def get_root_podcast_path(cls) -> str:
-        # return PurePath(Path.cwd()).joinpath(cls.get(ROOT_PODCAST_PATH))
-        return PurePath(Path(cls.get(ROOT_PODCAST_PATH)).expanduser())
+        if cls.get(ROOT_PODCAST_PATH) == '':
+            root_podcast_path = PurePath(Path.home() / 'Music/Zotify Podcasts/')
+        else:
+            root_podcast_path = PurePath(Path(cls.get(ROOT_PODCAST_PATH)).expanduser())
+        Path(root_podcast_path).mkdir(parents=True, exist_ok=True)
+        return root_podcast_path
 
     @classmethod
     def get_skip_existing_files(cls) -> bool:
@@ -196,12 +208,38 @@ class Config:
         return cls.get(BITRATE)
 
     @classmethod
-    def get_song_archive(cls) -> str:
-        return PurePath(cls.get_root_path()).joinpath(cls.get(SONG_ARCHIVE))
+    def get_track_archive(cls) -> str:
+        if cls.get(TRACK_ARCHIVE) == '':
+            system_paths = {
+                'win32': Path.home() / 'AppData/Roaming/Zotify',
+                'linux': Path.home() / '.local/share/zotify',
+                'darwin': Path.home() / 'Library/Application Support/Zotify'
+            }
+            if sys.platform not in system_paths:
+                track_archive =  PurePath(Path.cwd() / '.zotify/track_archive')
+            else:
+                track_archive = PurePath(system_paths[sys.platform] / 'track_archive')
+        else:
+            track_archive = PurePath(Path(cls.get(TRACK_ARCHIVE)).expanduser())
+        Path(track_archive.parent).mkdir(parents=True, exist_ok=True)
+        return track_archive
 
     @classmethod
     def get_credentials_location(cls) -> str:
-        return PurePath(Path.cwd()).joinpath(cls.get(CREDENTIALS_LOCATION))
+        if cls.get(CREDENTIALS_LOCATION) == '':
+            system_paths = {
+                'win32': Path.home() / 'AppData/Roaming/Zotify',
+                'linux': Path.home() / '.local/share/zotify',
+                'darwin': Path.home() / 'Library/Application Support/Zotify'
+            }
+            if sys.platform not in system_paths:
+                credentials_location = PurePath(Path.cwd() / '.zotify/credentials.json')
+            else:
+                credentials_location = PurePath(system_paths[sys.platform] / 'credentials.json')
+        else:
+            credentials_location = PurePath(Path.cwd()).joinpath(cls.get(CREDENTIALS_LOCATION))
+        Path(credentials_location.parent).mkdir(parents=True, exist_ok=True)
+        return credentials_location
 
     @classmethod
     def get_temp_download_dir(cls) -> str:

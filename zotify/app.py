@@ -1,6 +1,5 @@
 from librespot.audio.decoders import AudioQuality
 from tabulate import tabulate
-#import os
 from pathlib import Path
 
 from zotify.album import download_album, download_artist_albums
@@ -23,10 +22,10 @@ def client(args) -> None:
     Printer.print(PrintChannel.SPLASH, splash())
 
     if Zotify.check_premium():
-        Printer.print(PrintChannel.WARNINGS, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n\n')
+        Printer.print(PrintChannel.WARNINGS, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n')
         Zotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
     else:
-        Printer.print(PrintChannel.WARNINGS, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n\n')
+        Printer.print(PrintChannel.WARNINGS, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n')
         Zotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
 
     if args.download:
@@ -42,7 +41,8 @@ def client(args) -> None:
             Printer.print(PrintChannel.ERRORS, f'File {filename} not found.\n')
 
     if args.urls:
-        download_from_urls(args.urls)
+        if len(args.urls) > 0:
+            download_from_urls(args.urls)
 
     if args.playlist:
         download_from_user_playlist()
@@ -54,13 +54,14 @@ def client(args) -> None:
             else:
                 download_track('liked', song[TRACK][ID])
 
-    if args.search_spotify:
-        search_text = ''
-        while len(search_text) == 0:
-            search_text = input('Enter search or URL: ')
+    if args.search:
+        if args.search == ' ':
+            search_text = ''
+            while len(search_text) == 0:
+                search_text = input('Enter search or URL: ')
 
-        if not download_from_urls([search_text]):
-            search(search_text)
+        if not download_from_urls([args.search]):
+            search(args.search)
 
 def download_from_urls(urls: list[str]) -> bool:
     """ Downloads from a list of urls """

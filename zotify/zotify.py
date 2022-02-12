@@ -1,7 +1,5 @@
-import os
-import os.path
 from pathlib import Path
-from getpass import getpass
+from pwinput import pwinput
 import time
 import requests
 from librespot.audio.decoders import VorbisOnlyAudioQuality
@@ -29,7 +27,8 @@ class Zotify:
 
         if Path(cred_location).is_file():
             try:
-                cls.SESSION = Session.Builder().stored_file(cred_location).create()
+                conf = Session.Configuration.Builder().set_store_credentials(False).build()
+                cls.SESSION = Session.Builder(conf).stored_file(cred_location).create()
                 return
             except RuntimeError:
                 pass
@@ -37,7 +36,7 @@ class Zotify:
             user_name = ''
             while len(user_name) == 0:
                 user_name = input('Username: ')
-            password = getpass()
+            password = pwinput(prompt='Password: ', mask='*')
             try:
                 conf = Session.Configuration.Builder().set_stored_credential_file(cred_location).build()
                 cls.SESSION = Session.Builder(conf).user_pass(user_name, password).create()
@@ -80,7 +79,10 @@ class Zotify:
         headers = cls.get_auth_header()
         response = requests.get(url, headers=headers)
         responsetext = response.text
-        responsejson = response.json()
+        try:
+            responsejson = response.json()
+        except requests.exceptions.JSONDecodeError:
+            responsejson = {}
 
         if 'error' in responsejson:
             if tryCount < (cls.CONFIG.get_retry_attempts() - 1):

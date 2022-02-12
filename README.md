@@ -3,66 +3,58 @@
 ### A music and podcast downloader needing only a python interpreter and ffmpeg.
 
 <p align="center">
-  <img src="https://i.imgur.com/hGXQWSl.png">
+  <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
 </p>
 
-[Discord Server](https://discord.gg/XDYsFRTUjE) - [NotABug Mirror](https://notabug.org/Zotify/zotify)
+[Discord Server](https://discord.gg/XDYsFRTUjE)
+
+### Install
 
 ```
-Requirements:
-
-Binaries
+Dependencies:
 
 - Python 3.9 or greater
 - ffmpeg*
-- Git**
 
-Python packages:
+Installation:
 
-- pip install -r requirements.txt
-
+python -m pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip
 ```
 
-\*ffmpeg can be installed via apt for Debian-based distros or by downloading the binaries from [ffmpeg.org](https://ffmpeg.org) and placing them in your %PATH% in Windows. Mac users can install it with [Homebrew](https://brew.sh) by running `brew install ffmpeg`.
+\*Windows users can download the binaries from [ffmpeg.org](https://ffmpeg.org) and add them to %PATH%. Mac users can install it via [Homebrew](https://brew.sh) by running `brew install ffmpeg`. Linux users should already know how to install ffmpeg, I don't want to add instructions for every package manager.
 
-\*\*Git can be installed via apt for Debian-based distros or by downloading the binaries from [git-scm.com](https://git-scm.com/download/win) for Windows.
-
-### Command line usage:
+### Command line usage
 
 ```
 Basic command line usage:
   zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
 
-Different usage modes:
-  (nothing)            Download the tracks/alumbs/playlists URLs from the parameter
-  -d,  --download      Download all tracks/alumbs/playlists URLs from the specified file
-  -p,  --playlist      Downloads a saved playlist from your account
-  -ls, --liked-songs   Downloads all the liked songs from your account
-  -s,  --search        Loads search prompt to find then download a specific track, album or playlist
-  
-Extra command line options:
-  -ns, --no-splash     Suppress the splash screen when loading.
-  --config-location    Use a different config.json.
+Basic options:
+  (nothing)        Download the tracks/alumbs/playlists URLs from the parameter
+  -d, --download   Download all tracks/alumbs/playlists URLs from the specified file
+  -p, --playlist   Downloads a saved playlist from your account
+  -l, --liked      Downloads all the liked songs from your account
+  -s, --search     Searches for specified track, album, artist or playlist, loads search prompt if none are given.
 ```
 
-### Options:
+### Options
 
 All these options can either be configured in the config or via the commandline, in case of both the commandline-option has higher priority.  
 Be aware you have to set boolean values in the commandline like this: `--download-real-time=True`
 
 | Key (config)                 | commandline parameter            | Description
 |------------------------------|----------------------------------|---------------------------------------------------------------------|
-| ROOT_PATH                    | --root-path                      | directory where Zotify saves the music
-| ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves the podcasts
+| ROOT_PATH                    | --root-path                      | directory where Zotify saves music
+| ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves podcasts
 | SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
-| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Create a .song_archive file and skip previously downloaded songs
+| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
 | DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
 | FORCE_PREMIUM                | --force-premium                  | Force the use of high quality downloads (only with premium accounts)
 | ANTI_BAN_WAIT_TIME           | --anti-ban-wait-time             | The wait time between bulk downloads
 | OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
-| CHUNK_SIZE                   | --chunk-size                     | chunk size for downloading
-| SPLIT_ALBUM_DISCS            | --split-album-discs              | split downloaded albums by disc
-| DOWNLOAD_REAL_TIME           | --download-real-time             | only downloads songs as fast as they would be played, can prevent account bans
+| CHUNK_SIZE                   | --chunk-size                     | Chunk size for downloading
+| SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
+| DOWNLOAD_REAL_TIME           | --download-real-time             | Downloads songs as fast as they would be played, should prevent account bans.
 | LANGUAGE                     | --language                       | Language for spotify metadata
 | BITRATE                      | --bitrate                        | Overwrite the bitrate for ffmpeg encoding
 | SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
@@ -75,7 +67,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
 | TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
 
-### Output format:
+### Output format
 
 With the option `OUTPUT` (or the commandline parameter `--output`) you can specify the output location and format.  
 The value is relative to the `ROOT_PATH`/`ROOT_PODCAST_PATH` directory and can contain the following placeholder:
@@ -100,7 +92,7 @@ Example values could be:
 ~~~~
 {playlist}/{artist} - {song_name}.{ext}
 {playlist}/{playlist_num} - {artist} - {song_name}.{ext}
-Liked Songs/{artist} - {song_name}.{ext}
+Bangers/{artist} - {song_name}.{ext}
 {artist} - {song_name}.{ext}
 {artist}/{album}/{album_num} - {artist} - {song_name}.{ext}
 /home/user/downloads/{artist} - {song_name} [{id}].{ext}
@@ -135,7 +127,3 @@ Please refer to [CONTRIBUTING](CONTRIBUTING.md)
 ### Changelog
 
 Please refer to [CHANGELOG](CHANGELOG.md)
-
-### Common Errors
-
-Please refer to [COMMON_ERRORS](COMMON_ERRORS.md)

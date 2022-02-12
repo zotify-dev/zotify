@@ -18,7 +18,7 @@ def main():
                         help='Suppress the splash screen when loading.')
     parser.add_argument('--config-location',
                         type=str,
-                        help='Specify the json config location')
+                        help='Specify the zconfig.json location')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('urls',
                        type=str,
@@ -26,7 +26,7 @@ def main():
                        default='',
                        nargs='*',
                        help='Downloads the track, album, playlist, podcast episode, or all albums by an artist from a url. Can take multiple urls.')
-    group.add_argument('-ls', '--liked-songs',
+    group.add_argument('-l', '--liked',
                        dest='liked_songs',
                        action='store_true',
                        help='Downloads all the liked songs from your account.')
@@ -34,8 +34,9 @@ def main():
                        action='store_true',
                        help='Downloads a saved playlist from your account.')
     group.add_argument('-s', '--search',
-                       dest='search_spotify',
-                       action='store_true',
+                       type=str,
+                       nargs='?',
+                       const=' ',
                        help='Loads search prompt to find then download a specific track, album or playlist')
     group.add_argument('-d', '--download',
                        type=str,
@@ -51,6 +52,7 @@ def main():
 
     args = parser.parse_args()
     args.func(args)
+
 
 if __name__ == '__main__':
     main()

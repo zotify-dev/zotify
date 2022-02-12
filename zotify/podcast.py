@@ -7,7 +7,7 @@ from librespot.metadata import EpisodeId
 
 from zotify.const import ERROR, ID, ITEMS, NAME, SHOW, DURATION_MS
 from zotify.termoutput import PrintChannel, Printer
-from zotify.utils import create_download_directory, fix_filename, convert_audio_format
+from zotify.utils import create_download_directory, fix_filename
 from zotify.zotify import Zotify
 from zotify.loader import Loader
 
@@ -24,7 +24,7 @@ def get_episode_info(episode_id_str) -> Tuple[Optional[str], Optional[str]]:
     duration_ms = info[DURATION_MS]
     if ERROR in info:
         return None, None
-    return fix_filename(info[SHOW][NAME]), duration_ms,  fix_filename(info[NAME])
+    return fix_filename(info[SHOW][NAME]), duration_ms, fix_filename(info[NAME])
 
 
 def get_show_episodes(show_id_str) -> list:
@@ -47,7 +47,6 @@ def get_show_episodes(show_id_str) -> list:
 
 def download_podcast_directly(url, filename):
     import functools
-    # import pathlib
     import shutil
     import requests
     from tqdm.auto import tqdm
@@ -59,7 +58,6 @@ def download_podcast_directly(url, filename):
             f"Request to {url} returned status code {r.status_code}")
     file_size = int(r.headers.get('Content-Length', 0))
 
-    # path = pathlib.Path(filename).expanduser().resolve()
     path = Path(filename).expanduser().resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
 

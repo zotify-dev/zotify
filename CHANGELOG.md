@@ -2,14 +2,31 @@
 ## v0.6
 **General changes**
 - Switched from os.path to pathlib
-- Zotify can now be installed with pip - 
-`pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip`
-- Zotify can be ran from any directory with `zotify [args]`, you no longer need to prefix `python` in the command.
+- Renamed .song_archive to track_archive
+- Zotify can now be installed with `pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip`
+- Zotify can be ran from any directory with `zotify [args]`, you no longer need to prefix "python" in the command.
+- The -s option now takes search input as a command argument, it will still promt you if no search is given.
+- The -ls/--liked-songs option has been shrotened to -l/--liked,
 - New default config locations:
   - Windows: `%AppData%\Roaming\Zotify\config.json`
   - Linux: `~/.config/zotify/config.json`
   - macOS: `~/Library/Application Support/Zotify/config.json`
-  - You can still use `--config-location` to specify a local config file.
+  - Other/Undetected: `.zotify/config.json` 
+  - You can still use `--config-location` to specify a different location.
+- New default config locations:
+  - Windows: `%AppData%\Roaming\Zotify\credentials.json`
+  - Linux: `~/.local/share/zotify/credentials.json`
+  - macOS: `~/Library/Application Support/Zotify/credentials.json`
+  - Other/Undetected: `.zotify/credentials.json` 
+  - You can still use `--credentials-location` to specify a different file.
+- New default music and podcast locations:
+  - Windows: `C:\Users\<user>\Music\Zotify Music\` & `C:\Users\<user>\Music\Zotify Podcasts\`
+  - Linux & macOS: `~/Music/Zotify Music/` & `~/Music/Zotify Podcasts/`
+  - Other/Undetected: `./Zotify Music/` & `./Zotify Podcasts/`
+  - You can still use `--root-path` and `--root-podcast-path` respectively to specify a differnt location
+- Singles are now stored in their own folders
+- Fixed default config not loading on first run
+- Now shows asterisks when entering password
 
 **Docker**
 - Dockerfile is currently broken, it will be fixed soon. \

@@ -36,7 +36,7 @@ def get_previously_downloaded() -> List[str]:
     """ Returns list of all time downloaded songs """
 
     ids = []
-    archive_path = Zotify.CONFIG.get_song_archive()
+    archive_path = Zotify.CONFIG.get_track_archive()
 
     if Path(archive_path).exists():
         with open(archive_path, 'r', encoding='utf-8') as f:
@@ -48,7 +48,7 @@ def get_previously_downloaded() -> List[str]:
 def add_to_archive(song_id: str, filename: str, author_name: str, song_name: str) -> None:
     """ Adds song id to all time installed songs archive """
 
-    archive_path = Zotify.CONFIG.get_song_archive()
+    archive_path = Zotify.CONFIG.get_track_archive()
 
     if Path(archive_path).exists():
         with open(archive_path, 'a', encoding='utf-8') as file:
@@ -109,11 +109,12 @@ def split_input(selection) -> List[str]:
 def splash() -> str:
     """ Displays splash screen """
     return """
-███████  ██████  ████████ ██ ███████ ██    ██
-   ███  ██    ██    ██    ██ ██       ██  ██
-  ███   ██    ██    ██    ██ █████     ████
- ███    ██    ██    ██    ██ ██         ██
-███████  ██████     ██    ██ ██         ██
+███████╗ ██████╗ ████████╗██╗███████╗██╗   ██╗
+╚══███╔╝██╔═══██╗╚══██╔══╝██║██╔════╝╚██╗ ██╔╝
+  ███╔╝ ██║   ██║   ██║   ██║█████╗   ╚████╔╝ 
+ ███╔╝  ██║   ██║   ██║   ██║██╔══╝    ╚██╔╝  
+███████╗╚██████╔╝   ██║   ██║██║        ██║   
+╚══════╝ ╚═════╝    ╚═╝   ╚═╝╚═╝        ╚═╝   
     """
 
 

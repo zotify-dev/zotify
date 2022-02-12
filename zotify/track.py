@@ -1,4 +1,3 @@
-# import os
 from pathlib import Path, PurePath
 import re
 import time
@@ -152,8 +151,6 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
         if not check_id and check_name:
             c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
 
-            # fname = os.path.splitext(os.path.basename(filename))[0]
-            # ext = os.path.splitext(os.path.basename(filename))[1]
             fname = PurePath(PurePath(filename).name).parent
             ext = PurePath(PurePath(filename).name).suffix
 
@@ -252,7 +249,6 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
 def convert_audio_format(filename) -> None:
     """ Converts raw audio into playable file """
-    # temp_filename = f'{os.path.splitext(filename)[0]}.tmp'
     temp_filename = f'{PurePath(filename).parent}.tmp'
     Path(filename).replace(temp_filename)
 

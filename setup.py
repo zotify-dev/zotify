@@ -1,10 +1,10 @@
-import pathlib
+from pathlib import Path
 from distutils.core import setup
 from setuptools import setup, find_packages
 
 
 # The directory containing this file
-HERE = pathlib.Path(__file__).parent
+HERE = Path(__file__).parent
 
 # The text of the README file
 README = (HERE / "README.md").read_text()
@@ -13,7 +13,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="zotify",
     version="0.6.0",
-    author="Zotify",
+    author="Zotify Contributors",
     description="A music and podcast downloader.",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -30,6 +30,6 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
-    install_requires=['ffmpy', 'music_tag', 'Pillow', 'protobuf', 'tabulate', 'tqdm',
+    install_requires=['ffmpy', 'music_tag', 'Pillow', 'protobuf', 'pwinput', 'tabulate', 'tqdm',
                       'librespot @ https://github.com/kokarare1212/librespot-python/archive/refs/heads/rewrite.zip'],
 )
