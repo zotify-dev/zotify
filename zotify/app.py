@@ -5,6 +5,7 @@ from pathlib import Path
 from zotify.album import download_album, download_artist_albums
 from zotify.const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
     OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME, TYPE
+from zotify.loader import Loader
 from zotify.playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
 from zotify.podcast import download_episode, get_show_episodes
 from zotify.termoutput import Printer, PrintChannel
@@ -17,16 +18,20 @@ SEARCH_URL = 'https://api.spotify.com/v1/search'
 
 def client(args) -> None:
     """ Connects to download server to perform query's and get songs to download """
+    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Signing in...")
+    prepare_download_loader.start()
     Zotify(args)
+    prepare_download_loader.stop()
 
     Printer.print(PrintChannel.SPLASH, splash())
 
-    if Zotify.check_premium():
-        Printer.print(PrintChannel.WARNINGS, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n')
-        Zotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
-    else:
-        Printer.print(PrintChannel.WARNINGS, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n')
-        Zotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
+    quality_options = {
+        'auto': AudioQuality.VERY_HIGH if Zotify.check_premium() else AudioQuality.HIGH,
+        'normal': AudioQuality.NORMAL,
+        'high': AudioQuality.HIGH,
+        'very_high': AudioQuality.VERY_HIGH
+    }
+    Zotify.DOWNLOAD_QUALITY = quality_options[Zotify.CONFIG.get_download_quality()]
 
     if args.download:
         urls = []

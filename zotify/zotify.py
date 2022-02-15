@@ -97,4 +97,4 @@ class Zotify:
     @classmethod
     def check_premium(cls) -> bool:
         """ If user has spotify premium return true """
-        return (cls.SESSION.get_user_attribute(TYPE) == PREMIUM) or cls.CONFIG.get_force_premium()
+        return (cls.SESSION.get_user_attribute(TYPE) == PREMIUM)

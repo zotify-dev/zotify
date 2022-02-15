@@ -101,7 +101,7 @@ def download_episode(episode_id) -> None:
             if (
                 Path(filepath).isfile()
                 and Path(filepath).stat().st_size == total_size
-                and Zotify.CONFIG.get_skip_existing_files()
+                and Zotify.CONFIG.get_skip_existing()
             ):
                 Printer.print(PrintChannel.SKIPS, "\n###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
                 prepare_download_loader.stop()

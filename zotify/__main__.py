@@ -12,7 +12,7 @@ from zotify.config import CONFIG_VALUES
 
 def main():
     parser = argparse.ArgumentParser(prog='zotify',
-        description='A music and podcast downloader needing only a python interpreter and ffmpeg.')
+        description='A music and podcast downloader needing only python and ffmpeg.')
     parser.add_argument('-ns', '--no-splash',
                         action='store_true',
                         help='Suppress the splash screen when loading.')

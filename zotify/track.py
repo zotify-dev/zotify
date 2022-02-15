@@ -6,7 +6,7 @@ from typing import Any, Tuple, List
 
 from librespot.audio.decoders import AudioQuality
 from librespot.metadata import TrackId
-from ffmpy import FFmpeg
+import ffmpy
 
 from zotify.const import TRACKS, ALBUM, GENRES, NAME, ITEMS, DISC_NUMBER, TRACK_NUMBER, IS_PLAYABLE, ARTISTS, IMAGES, URL, \
     RELEASE_DATE, ID, TRACKS_URL, SAVED_TRACKS_URL, TRACK_STATS_URL, CODEC_MAP, EXT_MAP, DURATION_MS, HREF
@@ -171,7 +171,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                 prepare_download_loader.stop()
                 Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
             else:
-                if check_id and check_name and Zotify.CONFIG.get_skip_existing_files():
+                if check_id and check_name and Zotify.CONFIG.get_skip_existing():
                     prepare_download_loader.stop()
                     Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
 
@@ -231,8 +231,8 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     if not check_id:
                         add_to_directory_song_ids(filedir, scraped_song_id, PurePath(filename).name, artists[0], name)
 
-                    if not Zotify.CONFIG.get_anti_ban_wait_time():
-                        time.sleep(Zotify.CONFIG.get_anti_ban_wait_time())
+                    if not Zotify.CONFIG.get_bulk_wait_time():
+                        time.sleep(Zotify.CONFIG.get_bulk_wait_time())
         except Exception as e:
             Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
             Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
@@ -255,12 +255,14 @@ def convert_audio_format(filename) -> None:
     download_format = Zotify.CONFIG.get_download_format().lower()
     file_codec = CODEC_MAP.get(download_format, 'copy')
     if file_codec != 'copy':
-        bitrate = Zotify.CONFIG.get_bitrate()
-        if not bitrate:
-            if Zotify.DOWNLOAD_QUALITY == AudioQuality.VERY_HIGH:
-                bitrate = '320k'
-            else:
-                bitrate = '160k'
+        bitrate = Zotify.CONFIG.get_transcode_bitrate()
+        bitrates = {
+            'auto': '320k' if Zotify.check_premium() else '160k',
+            'normal': '96k',
+            'high': '160k',
+            'very_high': '320k'
+        }
+        bitrate = bitrates[Zotify.CONFIG.get_download_quality()]
     else:
         bitrate = None
 
@@ -268,14 +270,17 @@ def convert_audio_format(filename) -> None:
     if bitrate:
         output_params += ['-b:a', bitrate]
 
-    ff_m = FFmpeg(
-        global_options=['-y', '-hide_banner', '-loglevel error'],
-        inputs={temp_filename: None},
-        outputs={filename: output_params}
-    )
+    try:
+        ff_m = ffmpy.FFmpeg(
+            global_options=['-y', '-hide_banner', '-loglevel error'],
+            inputs={temp_filename: None},
+            outputs={filename: output_params}
+        )
+        with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
+            ff_m.run()
 
-    with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
-        ff_m.run()
+        if Path(temp_filename).exists():
+            Path(temp_filename).unlink()
 
-    if Path(temp_filename).exists():
-        Path(temp_filename).unlink()
+    except ffmpy.FFExecutableNotFoundError:
+        Printer.print(PrintChannel.ERRORS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')

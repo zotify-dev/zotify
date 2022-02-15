@@ -1,19 +1,25 @@
 # Changelog
 ## v0.6
 **General changes**
-- Switched from os.path to pathlib
-- Renamed .song_archive to track_archive
+- Added "DOWNLOAD_QUALITY" config option. This can be "normal" (96kbks), "high" (160kpbs), "very-high" (320kpbs, premium only) or "auto" which selects the highest format available for your account automatically.
+- The "FORCE_PREMIUM" option has been removed, the same result can be achieved with `--download-quality="very-high"`.
+- The "BITRATE" option has been renamed "TRANSCODE_BITRATE" as it now only effects transcodes
+- FFmpeg is now semi-optional, not having it installed means you are limited to saving music as ogg vorbis.
 - Zotify can now be installed with `pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip`
 - Zotify can be ran from any directory with `zotify [args]`, you no longer need to prefix "python" in the command.
 - The -s option now takes search input as a command argument, it will still promt you if no search is given.
 - The -ls/--liked-songs option has been shrotened to -l/--liked,
+- Singles are now stored in their own folders under the artist folder
+- Fixed default config not loading on first run
+- Now shows asterisks when entering password
+- Switched from os.path to pathlib
 - New default config locations:
   - Windows: `%AppData%\Roaming\Zotify\config.json`
   - Linux: `~/.config/zotify/config.json`
   - macOS: `~/Library/Application Support/Zotify/config.json`
   - Other/Undetected: `.zotify/config.json` 
   - You can still use `--config-location` to specify a different location.
-- New default config locations:
+- New default credential locations:
   - Windows: `%AppData%\Roaming\Zotify\credentials.json`
   - Linux: `~/.local/share/zotify/credentials.json`
   - macOS: `~/Library/Application Support/Zotify/credentials.json`
@@ -24,9 +30,6 @@
   - Linux & macOS: `~/Music/Zotify Music/` & `~/Music/Zotify Podcasts/`
   - Other/Undetected: `./Zotify Music/` & `./Zotify Podcasts/`
   - You can still use `--root-path` and `--root-podcast-path` respectively to specify a differnt location
-- Singles are now stored in their own folders
-- Fixed default config not loading on first run
-- Now shows asterisks when entering password
 
 **Docker**
 - Dockerfile is currently broken, it will be fixed soon. \

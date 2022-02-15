@@ -1,6 +1,6 @@
 # Zotify
 
-### A music and podcast downloader needing only a python interpreter and ffmpeg.
+### A highly customizable music and podcast downloader.
 
 <p align="center">
   <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
@@ -8,20 +8,33 @@
 
 [Discord Server](https://discord.gg/XDYsFRTUjE)
 
+### Featues
+  - Downloads at up to 320kbps*
+  - Downloads directly from the source**
+  - Downloads podcasts, playlists, liked songs, albums, artists, singles.
+  - Option to download in real time to appear more legitimate***
+  - Supports multiple audio formats
+  - Download directly from URL or use built-in in search
+  - Bulk downloads from a list of URLs in a text file or parsed directly as arguments
+
+*Free accounts are limited to 160kbps. \
+**Audio files are NOT substituted with ones from other sources such as YouTube or Deezer, they are sourced directly. \
+***'real time' refers to downloading at the speed it would normally be streamed at (the duration of the track).
+
 ### Install
 
 ```
 Dependencies:
 
 - Python 3.9 or greater
-- ffmpeg*
+- FFmpeg*
 
 Installation:
 
 python -m pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip
 ```
 
-\*Windows users can download the binaries from [ffmpeg.org](https://ffmpeg.org) and add them to %PATH%. Mac users can install it via [Homebrew](https://brew.sh) by running `brew install ffmpeg`. Linux users should already know how to install ffmpeg, I don't want to add instructions for every package manager.
+\*Zotify will work without FFmpeg but transcoding will be unavailable.
 
 ### Command line usage
 
@@ -44,28 +57,33 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 
 | Key (config)                 | commandline parameter            | Description
 |------------------------------|----------------------------------|---------------------------------------------------------------------|
-| ROOT_PATH                    | --root-path                      | directory where Zotify saves music
-| ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves podcasts
-| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
-| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
-| DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
-| FORCE_PREMIUM                | --force-premium                  | Force the use of high quality downloads (only with premium accounts)
-| ANTI_BAN_WAIT_TIME           | --anti-ban-wait-time             | The wait time between bulk downloads
-| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
-| CHUNK_SIZE                   | --chunk-size                     | Chunk size for downloading
-| SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
-| DOWNLOAD_REAL_TIME           | --download-real-time             | Downloads songs as fast as they would be played, should prevent account bans.
-| LANGUAGE                     | --language                       | Language for spotify metadata
-| BITRATE                      | --bitrate                        | Overwrite the bitrate for ffmpeg encoding
-| SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
 | CREDENTIALS_LOCATION         | --credentials-location           | The location of the credentials.json
 | OUTPUT                       | --output                         | The output location/format (see below)
-| PRINT_SPLASH                 | --print-splash                   | Print the splash message
-| PRINT_SKIPS                  | --print-skips                    | Print messages if a song is being skipped
-| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | Print the download/playlist progress bars
-| PRINT_ERRORS                 | --print-errors                   | Print errors
+| SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
+| ROOT_PATH                    | --root-path                      | Directory where Zotify saves music
+| ROOT_PODCAST_PATH            | --root-podcast-path              | Directory where Zotify saves podcasts
+| SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
+| MD_ALLGENRES                 | --md-allgenres                   | Save all relevant genres in metadata
+| MD_GENREDELIMITER            | --md-genredelimiter              | Delimiter character used to split genres in metadata
+| DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
+| DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very-high*)
+| TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
+| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
+| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
+| RETRY_ATTEMPTS               | --retry-attempts                 | Number of times Zotify will retry a failed request
+| BULK_WAIT_TIME               | --bulk-wait-time                 | The wait time between bulk downloads
+| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
+| CHUNK_SIZE                   | --chunk-size                     | Chunk size for downloading
+| DOWNLOAD_REAL_TIME           | --download-real-time             | Downloads songs as fast as they would be played, should prevent account bans.
+| LANGUAGE                     | --language                       | Language for spotify metadata
+| PRINT_SPLASH                 | --print-splash                   | Show the Zotify logo at startup
+| PRINT_SKIPS                  | --print-skips                    | Show messages if a song is being skipped
+| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | Show download/playlist progress bars
+| PRINT_ERRORS                 | --print-errors                   | Show errors
 | PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
 | TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
+
+*very-high is limited to premium only
 
 ### Output format
 
@@ -106,6 +124,11 @@ Create and run a container from the image:
   docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/config.json:/config.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
 ```
 
+### What do I do if I see "Your session has been terminated"?
+
+If you see this, don't worry! Just try logging back in. If you see the incorrect username or password error, reset your password and you should be able to log back in.
+
+
 ### Will my account get banned if I use this tool?
 
 Currently no user has reported their account getting banned after using Zotify.
@@ -114,11 +137,9 @@ It is recommended you use Zotify with a burner account.
 Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus appearing less suspicious.
 This option is much slower and is only recommended for premium users who wish to download songs in 320kbps without buying premium on a burner account.
 
-**Use Zotify at your own risk**, the developers of Zotify are not responsible if your account gets banned.
-
-### What do I do if I see "Your session has been terminated"?
-
-If you see this, don't worry! Just try logging back in. If you see the incorrect username or password error, reset your password and you should be able to log back in.
+### Disclaimer
+Zotify is intended to be used in compliance with DMCA, Section 1201, for educational, private and fair use. \
+Zotify contributors are not responsible for any misuse of the program or source code.
 
 ### Contributing
 
