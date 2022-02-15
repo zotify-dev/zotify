@@ -7,12 +7,12 @@ It's like youtube-dl, but for that other music platform.
 
 import argparse
 
-from app import client
-from config import CONFIG_VALUES
+from zotify.app import client
+from zotify.config import CONFIG_VALUES
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(prog='zotify',
-        description='A music and podcast downloader needing only a python interpreter and ffmpeg.')
+        description='A music and podcast downloader needing only python and ffmpeg.')
     parser.add_argument('-ns', '--no-splash',
                         action='store_true',
                         help='Suppress the splash screen when loading.')
@@ -26,7 +26,7 @@ if __name__ == '__main__':
                        default='',
                        nargs='*',
                        help='Downloads the track, album, playlist, podcast episode, or all albums by an artist from a url. Can take multiple urls.')
-    group.add_argument('-ls', '--liked-songs',
+    group.add_argument('-l', '--liked',
                        dest='liked_songs',
                        action='store_true',
                        help='Downloads all the liked songs from your account.')
@@ -34,8 +34,9 @@ if __name__ == '__main__':
                        action='store_true',
                        help='Downloads a saved playlist from your account.')
     group.add_argument('-s', '--search',
-                       dest='search_spotify',
-                       action='store_true',
+                       type=str,
+                       nargs='?',
+                       const=' ',
                        help='Loads search prompt to find then download a specific track, album or playlist')
     group.add_argument('-d', '--download',
                        type=str,
@@ -51,3 +52,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == '__main__':
+    main()

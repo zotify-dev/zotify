@@ -1,37 +1,42 @@
 from librespot.audio.decoders import AudioQuality
 from tabulate import tabulate
-import os
+from pathlib import Path
 
-from album import download_album, download_artist_albums
-from const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
+from zotify.album import download_album, download_artist_albums
+from zotify.const import TRACK, NAME, ID, ARTIST, ARTISTS, ITEMS, TRACKS, EXPLICIT, ALBUM, ALBUMS, \
     OWNER, PLAYLIST, PLAYLISTS, DISPLAY_NAME, TYPE
-from playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
-from podcast import download_episode, get_show_episodes
-from termoutput import Printer, PrintChannel
-from track import download_track, get_saved_tracks
-from utils import splash, split_input, regex_input_for_urls
-from zotify import Zotify
+from zotify.loader import Loader
+from zotify.playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
+from zotify.podcast import download_episode, get_show_episodes
+from zotify.termoutput import Printer, PrintChannel
+from zotify.track import download_track, get_saved_tracks
+from zotify.utils import splash, split_input, regex_input_for_urls
+from zotify.zotify import Zotify
 
 SEARCH_URL = 'https://api.spotify.com/v1/search'
 
 
 def client(args) -> None:
     """ Connects to download server to perform query's and get songs to download """
+    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Signing in...")
+    prepare_download_loader.start()
     Zotify(args)
+    prepare_download_loader.stop()
 
     Printer.print(PrintChannel.SPLASH, splash())
 
-    if Zotify.check_premium():
-        Printer.print(PrintChannel.SPLASH, '[ DETECTED PREMIUM ACCOUNT - USING VERY_HIGH QUALITY ]\n\n')
-        Zotify.DOWNLOAD_QUALITY = AudioQuality.VERY_HIGH
-    else:
-        Printer.print(PrintChannel.SPLASH, '[ DETECTED FREE ACCOUNT - USING HIGH QUALITY ]\n\n')
-        Zotify.DOWNLOAD_QUALITY = AudioQuality.HIGH
+    quality_options = {
+        'auto': AudioQuality.VERY_HIGH if Zotify.check_premium() else AudioQuality.HIGH,
+        'normal': AudioQuality.NORMAL,
+        'high': AudioQuality.HIGH,
+        'very_high': AudioQuality.VERY_HIGH
+    }
+    Zotify.DOWNLOAD_QUALITY = quality_options[Zotify.CONFIG.get_download_quality()]
 
     if args.download:
         urls = []
         filename = args.download
-        if os.path.exists(filename):
+        if Path(filename).exists():
             with open(filename, 'r', encoding='utf-8') as file:
                 urls.extend([line.strip() for line in file.readlines()])
 
@@ -41,7 +46,8 @@ def client(args) -> None:
             Printer.print(PrintChannel.ERRORS, f'File {filename} not found.\n')
 
     if args.urls:
-        download_from_urls(args.urls)
+        if len(args.urls) > 0:
+            download_from_urls(args.urls)
 
     if args.playlist:
         download_from_user_playlist()
@@ -53,21 +59,21 @@ def client(args) -> None:
             else:
                 download_track('liked', song[TRACK][ID])
 
-    if args.search_spotify:
-        search_text = ''
-        while len(search_text) == 0:
-            search_text = input('Enter search or URL: ')
+    if args.search:
+        if args.search == ' ':
+            search_text = ''
+            while len(search_text) == 0:
+                search_text = input('Enter search or URL: ')
 
-        if not download_from_urls([search_text]):
-            search(search_text)
+        if not download_from_urls([args.search]):
+            search(args.search)
 
 def download_from_urls(urls: list[str]) -> bool:
     """ Downloads from a list of urls """
     download = False
 
     for spotify_url in urls:
-        track_id, album_id, playlist_id, episode_id, show_id, artist_id = regex_input_for_urls(
-            spotify_url)
+        track_id, album_id, playlist_id, episode_id, show_id, artist_id = regex_input_for_urls(spotify_url)
 
         if track_id is not None:
             download = True

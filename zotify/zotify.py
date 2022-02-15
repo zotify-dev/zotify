@@ -1,15 +1,14 @@
-import os
-import os.path
-from getpass import getpass
+from pathlib import Path
+from pwinput import pwinput
 import time
 import requests
 from librespot.audio.decoders import VorbisOnlyAudioQuality
 from librespot.core import Session
 
-from const import TYPE, \
+from zotify.const import TYPE, \
     PREMIUM, USER_READ_EMAIL, OFFSET, LIMIT, \
     PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ
-from config import Config
+from zotify.config import Config
 
 class Zotify:    
     SESSION: Session = None
@@ -26,9 +25,10 @@ class Zotify:
 
         cred_location = Config.get_credentials_location()
 
-        if os.path.isfile(cred_location):
+        if Path(cred_location).is_file():
             try:
-                cls.SESSION = Session.Builder().stored_file(cred_location).create()
+                conf = Session.Configuration.Builder().set_store_credentials(False).build()
+                cls.SESSION = Session.Builder(conf).stored_file(cred_location).create()
                 return
             except RuntimeError:
                 pass
@@ -36,7 +36,7 @@ class Zotify:
             user_name = ''
             while len(user_name) == 0:
                 user_name = input('Username: ')
-            password = getpass()
+            password = pwinput(prompt='Password: ', mask='*')
             try:
                 conf = Session.Configuration.Builder().set_stored_credential_file(cred_location).build()
                 cls.SESSION = Session.Builder(conf).user_pass(user_name, password).create()
@@ -75,11 +75,14 @@ class Zotify:
     @classmethod
     def invoke_url(cls, url, tryCount=0):
         # we need to import that here, otherwise we will get circular imports!
-        from termoutput import Printer, PrintChannel
+        from zotify.termoutput import Printer, PrintChannel
         headers = cls.get_auth_header()
         response = requests.get(url, headers=headers)
         responsetext = response.text
-        responsejson = response.json()
+        try:
+            responsejson = response.json()
+        except requests.exceptions.JSONDecodeError:
+            responsejson = {}
 
         if 'error' in responsejson:
             if tryCount < (cls.CONFIG.get_retry_attempts() - 1):
@@ -94,4 +97,4 @@ class Zotify:
     @classmethod
     def check_premium(cls) -> bool:
         """ If user has spotify premium return true """
-        return (cls.SESSION.get_user_attribute(TYPE) == PREMIUM) or cls.CONFIG.get_force_premium()
+        return (cls.SESSION.get_user_attribute(TYPE) == PREMIUM)

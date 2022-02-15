@@ -1,81 +1,91 @@
 # Zotify
 
-### A music and podcast downloader needing only a python interpreter and ffmpeg.
+### A highly customizable music and podcast downloader.
 
 <p align="center">
-  <img src="https://i.imgur.com/hGXQWSl.png">
+  <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
 </p>
 
-[Discord Server](https://discord.gg/XDYsFRTUjE) - [NotABug Mirror](https://notabug.org/Zotify/zotify)
+[Discord Server](https://discord.gg/XDYsFRTUjE)
+
+### Featues
+  - Downloads at up to 320kbps*
+  - Downloads directly from the source**
+  - Downloads podcasts, playlists, liked songs, albums, artists, singles.
+  - Option to download in real time to appear more legitimate***
+  - Supports multiple audio formats
+  - Download directly from URL or use built-in in search
+  - Bulk downloads from a list of URLs in a text file or parsed directly as arguments
+
+*Free accounts are limited to 160kbps. \
+**Audio files are NOT substituted with ones from other sources such as YouTube or Deezer, they are sourced directly. \
+***'real time' refers to downloading at the speed it would normally be streamed at (the duration of the track).
+
+### Install
 
 ```
-Requirements:
-
-Binaries
+Dependencies:
 
 - Python 3.9 or greater
-- ffmpeg*
-- Git**
+- FFmpeg*
 
-Python packages:
+Installation:
 
-- pip install -r requirements.txt
-
+python -m pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip
 ```
 
-\*ffmpeg can be installed via apt for Debian-based distros or by downloading the binaries from [ffmpeg.org](https://ffmpeg.org) and placing them in your %PATH% in Windows. Mac users can install it with [Homebrew](https://brew.sh) by running `brew install ffmpeg`.
+\*Zotify will work without FFmpeg but transcoding will be unavailable.
 
-\*\*Git can be installed via apt for Debian-based distros or by downloading the binaries from [git-scm.com](https://git-scm.com/download/win) for Windows.
-
-### Command line usage:
+### Command line usage
 
 ```
 Basic command line usage:
-  python zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
+  zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
 
-Different usage modes:
-  (nothing)            Download the tracks/alumbs/playlists URLs from the parameter
-  -d,  --download      Download all tracks/alumbs/playlists URLs from the specified file
-  -p,  --playlist      Downloads a saved playlist from your account
-  -ls, --liked-songs   Downloads all the liked songs from your account
-  -s,  --search        Loads search prompt to find then download a specific track, album or playlist
-  
-Extra command line options:
-  -ns, --no-splash     Suppress the splash screen when loading.
-  --config-location    Use a different zconfig.json, defaults to the one in the program directory
+Basic options:
+  (nothing)        Download the tracks/alumbs/playlists URLs from the parameter
+  -d, --download   Download all tracks/alumbs/playlists URLs from the specified file
+  -p, --playlist   Downloads a saved playlist from your account
+  -l, --liked      Downloads all the liked songs from your account
+  -s, --search     Searches for specified track, album, artist or playlist, loads search prompt if none are given.
 ```
 
-### Options:
+### Options
 
-All these options can either be configured in the zconfig or via the commandline, in case of both the commandline-option has higher priority.  
+All these options can either be configured in the config or via the commandline, in case of both the commandline-option has higher priority.  
 Be aware you have to set boolean values in the commandline like this: `--download-real-time=True`
 
-| Key (zconfig)                | commandline parameter            | Description
+| Key (config)                 | commandline parameter            | Description
 |------------------------------|----------------------------------|---------------------------------------------------------------------|
-| ROOT_PATH                    | --root-path                      | directory where Zotify saves the music
-| ROOT_PODCAST_PATH            | --root-podcast-path              | directory where Zotify saves the podcasts
-| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
-| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Create a .song_archive file and skip previously downloaded songs
-| DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
-| FORCE_PREMIUM                | --force-premium                  | Force the use of high quality downloads (only with premium accounts)
-| ANTI_BAN_WAIT_TIME           | --anti-ban-wait-time             | The wait time between bulk downloads
-| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
-| CHUNK_SIZE                   | --chunk-size                     | chunk size for downloading
-| SPLIT_ALBUM_DISCS            | --split-album-discs              | split downloaded albums by disc
-| DOWNLOAD_REAL_TIME           | --download-real-time             | only downloads songs as fast as they would be played, can prevent account bans
-| LANGUAGE                     | --language                       | Language for spotify metadata
-| BITRATE                      | --bitrate                        | Overwrite the bitrate for ffmpeg encoding
-| SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
 | CREDENTIALS_LOCATION         | --credentials-location           | The location of the credentials.json
 | OUTPUT                       | --output                         | The output location/format (see below)
-| PRINT_SPLASH                 | --print-splash                   | Print the splash message
-| PRINT_SKIPS                  | --print-skips                    | Print messages if a song is being skipped
-| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | Print the download/playlist progress bars
-| PRINT_ERRORS                 | --print-errors                   | Print errors
+| SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
+| ROOT_PATH                    | --root-path                      | Directory where Zotify saves music
+| ROOT_PODCAST_PATH            | --root-podcast-path              | Directory where Zotify saves podcasts
+| SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
+| MD_ALLGENRES                 | --md-allgenres                   | Save all relevant genres in metadata
+| MD_GENREDELIMITER            | --md-genredelimiter              | Delimiter character used to split genres in metadata
+| DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
+| DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very-high*)
+| TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
+| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
+| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
+| RETRY_ATTEMPTS               | --retry-attempts                 | Number of times Zotify will retry a failed request
+| BULK_WAIT_TIME               | --bulk-wait-time                 | The wait time between bulk downloads
+| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
+| CHUNK_SIZE                   | --chunk-size                     | Chunk size for downloading
+| DOWNLOAD_REAL_TIME           | --download-real-time             | Downloads songs as fast as they would be played, should prevent account bans.
+| LANGUAGE                     | --language                       | Language for spotify metadata
+| PRINT_SPLASH                 | --print-splash                   | Show the Zotify logo at startup
+| PRINT_SKIPS                  | --print-skips                    | Show messages if a song is being skipped
+| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | Show download/playlist progress bars
+| PRINT_ERRORS                 | --print-errors                   | Show errors
 | PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
 | TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
 
-### Output format:
+*very-high is limited to premium only
+
+### Output format
 
 With the option `OUTPUT` (or the commandline parameter `--output`) you can specify the output location and format.  
 The value is relative to the `ROOT_PATH`/`ROOT_PODCAST_PATH` directory and can contain the following placeholder:
@@ -100,33 +110,36 @@ Example values could be:
 ~~~~
 {playlist}/{artist} - {song_name}.{ext}
 {playlist}/{playlist_num} - {artist} - {song_name}.{ext}
-Liked Songs/{artist} - {song_name}.{ext}
+Bangers/{artist} - {song_name}.{ext}
 {artist} - {song_name}.{ext}
 {artist}/{album}/{album_num} - {artist} - {song_name}.{ext}
 /home/user/downloads/{artist} - {song_name} [{id}].{ext}
 ~~~~
 
-### Docker Usage
+### Docker Usage - CURRENTLY BROKEN
 ```
 Build the docker image from the Dockerfile:
   docker build -t zotify .
 Create and run a container from the image:
-  docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/zconfig.json:/zconfig.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
+  docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/config.json:/config.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
 ```
+
+### What do I do if I see "Your session has been terminated"?
+
+If you see this, don't worry! Just try logging back in. If you see the incorrect username or password error, reset your password and you should be able to log back in.
+
 
 ### Will my account get banned if I use this tool?
 
 Currently no user has reported their account getting banned after using Zotify.
 
-We highly recommend using Zotify with a burner account.
-Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus not appearing suspicious.
+It is recommended you use Zotify with a burner account.
+Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus appearing less suspicious.
 This option is much slower and is only recommended for premium users who wish to download songs in 320kbps without buying premium on a burner account.
 
-**Use Zotify at your own risk**, the developers of Zotify are not responsible if your account gets banned.
-
-### What do I do if I see "Your session has been terminated"?
-
-If you see this, don't worry! Just try logging back in. If you see the incorrect username or password error, reset your password and you should be able to log back in.
+### Disclaimer
+Zotify is intended to be used in compliance with DMCA, Section 1201, for educational, private and fair use. \
+Zotify contributors are not responsible for any misuse of the program or source code.
 
 ### Contributing
 
@@ -135,7 +148,3 @@ Please refer to [CONTRIBUTING](CONTRIBUTING.md)
 ### Changelog
 
 Please refer to [CHANGELOG](CHANGELOG.md)
-
-### Common Errors
-
-Please refer to [COMMON_ERRORS](COMMON_ERRORS.md)

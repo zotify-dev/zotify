@@ -7,7 +7,7 @@ from shutil import get_terminal_size
 from threading import Thread
 from time import sleep
 
-from termoutput import Printer
+from zotify.termoutput import Printer
 
 
 class Loader:

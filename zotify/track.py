@@ -1,4 +1,4 @@
-import os
+from pathlib import Path, PurePath
 import re
 import time
 import uuid
@@ -6,16 +6,16 @@ from typing import Any, Tuple, List
 
 from librespot.audio.decoders import AudioQuality
 from librespot.metadata import TrackId
-from ffmpy import FFmpeg
+import ffmpy
 
-from const import TRACKS, ALBUM, GENRES, NAME, ITEMS, DISC_NUMBER, TRACK_NUMBER, IS_PLAYABLE, ARTISTS, IMAGES, URL, \
+from zotify.const import TRACKS, ALBUM, GENRES, NAME, ITEMS, DISC_NUMBER, TRACK_NUMBER, IS_PLAYABLE, ARTISTS, IMAGES, URL, \
     RELEASE_DATE, ID, TRACKS_URL, SAVED_TRACKS_URL, TRACK_STATS_URL, CODEC_MAP, EXT_MAP, DURATION_MS, HREF
-from termoutput import Printer, PrintChannel
-from utils import fix_filename, set_audio_tags, set_music_thumbnail, create_download_directory, \
+from zotify.termoutput import Printer, PrintChannel
+from zotify.utils import fix_filename, set_audio_tags, set_music_thumbnail, create_download_directory, \
     get_directory_song_ids, add_to_directory_song_ids, get_previously_downloaded, add_to_archive, fmt_seconds
-from zotify import Zotify
+from zotify.zotify import Zotify
 import traceback
-from loader import Loader
+from zotify.loader import Loader
 
 
 def get_saved_tracks() -> list:
@@ -136,25 +136,25 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
         output_template = output_template.replace("{track_id}", fix_filename(track_id))
         output_template = output_template.replace("{ext}", ext)
 
-        filename = os.path.join(Zotify.CONFIG.get_root_path(), output_template)
-        filedir = os.path.dirname(filename)
+        filename = PurePath(Zotify.CONFIG.get_root_path()).joinpath(output_template)
+        filedir = PurePath(filename).parent
 
         filename_temp = filename
         if Zotify.CONFIG.get_temp_download_dir() != '':
-            filename_temp = os.path.join(Zotify.CONFIG.get_temp_download_dir(), f'zotify_{str(uuid.uuid4())}_{track_id}.{ext}')
+            filename_temp = PurePath(Zotify.CONFIG.get_temp_download_dir()).joinpath(f'zotify_{str(uuid.uuid4())}_{track_id}.{ext}')
 
-        check_name = os.path.isfile(filename) and os.path.getsize(filename)
+        check_name = Path(filename).is_file() and Path(filename).stat().st_size
         check_id = scraped_song_id in get_directory_song_ids(filedir)
         check_all_time = scraped_song_id in get_previously_downloaded()
 
         # a song with the same name is installed
         if not check_id and check_name:
-            c = len([file for file in os.listdir(filedir) if re.search(f'^{filename}_', str(file))]) + 1
+            c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
 
-            fname = os.path.splitext(os.path.basename(filename))[0]
-            ext = os.path.splitext(os.path.basename(filename))[1]
+            fname = PurePath(PurePath(filename).name).parent
+            ext = PurePath(PurePath(filename).name).suffix
 
-            filename = os.path.join(filedir, f'{fname}_{c}{ext}')
+            filename = PurePath(filedir).joinpath(f'{fname}_{c}{ext}')
 
     except Exception as e:
         Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
@@ -171,7 +171,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                 prepare_download_loader.stop()
                 Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
             else:
-                if check_id and check_name and Zotify.CONFIG.get_skip_existing_files():
+                if check_id and check_name and Zotify.CONFIG.get_skip_existing():
                     prepare_download_loader.stop()
                     Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
 
@@ -218,21 +218,21 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     set_music_thumbnail(filename_temp, image_url)
 
                     if filename_temp != filename:
-                        os.rename(filename_temp, filename)
+                        Path(filename_temp).rename(filename)
 
                     time_finished = time.time()
 
-                    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{os.path.relpath(filename, Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
+                    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{Path(filename).relative_to(Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
 
                     # add song id to archive file
                     if Zotify.CONFIG.get_skip_previously_downloaded():
-                        add_to_archive(scraped_song_id, os.path.basename(filename), artists[0], name)
+                        add_to_archive(scraped_song_id, PurePath(filename).name, artists[0], name)
                     # add song id to download directory's .song_ids file
                     if not check_id:
-                        add_to_directory_song_ids(filedir, scraped_song_id, os.path.basename(filename), artists[0], name)
+                        add_to_directory_song_ids(filedir, scraped_song_id, PurePath(filename).name, artists[0], name)
 
-                    if not Zotify.CONFIG.get_anti_ban_wait_time():
-                        time.sleep(Zotify.CONFIG.get_anti_ban_wait_time())
+                    if not Zotify.CONFIG.get_bulk_wait_time():
+                        time.sleep(Zotify.CONFIG.get_bulk_wait_time())
         except Exception as e:
             Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
             Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
@@ -241,26 +241,28 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
             Printer.print(PrintChannel.ERRORS, "\n")
             Printer.print(PrintChannel.ERRORS, str(e) + "\n")
             Printer.print(PrintChannel.ERRORS, "".join(traceback.TracebackException.from_exception(e).format()) + "\n")
-            if os.path.exists(filename_temp):
-                os.remove(filename_temp)
+            if Path(filename_temp).exists():
+                Path(filename_temp).unlink()
 
     prepare_download_loader.stop()
 
 
 def convert_audio_format(filename) -> None:
     """ Converts raw audio into playable file """
-    temp_filename = f'{os.path.splitext(filename)[0]}.tmp'
-    os.replace(filename, temp_filename)
+    temp_filename = f'{PurePath(filename).parent}.tmp'
+    Path(filename).replace(temp_filename)
 
     download_format = Zotify.CONFIG.get_download_format().lower()
     file_codec = CODEC_MAP.get(download_format, 'copy')
     if file_codec != 'copy':
-        bitrate = Zotify.CONFIG.get_bitrate()
-        if not bitrate:
-            if Zotify.DOWNLOAD_QUALITY == AudioQuality.VERY_HIGH:
-                bitrate = '320k'
-            else:
-                bitrate = '160k'
+        bitrate = Zotify.CONFIG.get_transcode_bitrate()
+        bitrates = {
+            'auto': '320k' if Zotify.check_premium() else '160k',
+            'normal': '96k',
+            'high': '160k',
+            'very_high': '320k'
+        }
+        bitrate = bitrates[Zotify.CONFIG.get_download_quality()]
     else:
         bitrate = None
 
@@ -268,14 +270,17 @@ def convert_audio_format(filename) -> None:
     if bitrate:
         output_params += ['-b:a', bitrate]
 
-    ff_m = FFmpeg(
-        global_options=['-y', '-hide_banner', '-loglevel error'],
-        inputs={temp_filename: None},
-        outputs={filename: output_params}
-    )
+    try:
+        ff_m = ffmpy.FFmpeg(
+            global_options=['-y', '-hide_banner', '-loglevel error'],
+            inputs={temp_filename: None},
+            outputs={filename: output_params}
+        )
+        with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
+            ff_m.run()
 
-    with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
-        ff_m.run()
+        if Path(temp_filename).exists():
+            Path(temp_filename).unlink()
 
-    if os.path.exists(temp_filename):
-        os.remove(temp_filename)
+    except ffmpy.FFExecutableNotFoundError:
+        Printer.print(PrintChannel.ERRORS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')

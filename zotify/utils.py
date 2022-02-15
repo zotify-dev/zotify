@@ -5,14 +5,15 @@ import platform
 import re
 import subprocess
 from enum import Enum
+from pathlib import Path, PurePath
 from typing import List, Tuple
 
 import music_tag
 import requests
 
-from const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, ARTWORK, \
+from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, ARTWORK, \
     WINDOWS_SYSTEM, ALBUMARTIST
-from zotify import Zotify
+from zotify.zotify import Zotify
 
 
 class MusicFormat(str, Enum):
@@ -22,11 +23,11 @@ class MusicFormat(str, Enum):
 
 def create_download_directory(download_path: str) -> None:
     """ Create directory and add a hidden file with song ids """
-    os.makedirs(download_path, exist_ok=True)
+    Path(download_path).mkdir(parents=True, exist_ok=True)
 
     # add hidden file with song ids
-    hidden_file_path = os.path.join(download_path, '.song_ids')
-    if not os.path.isfile(hidden_file_path):
+    hidden_file_path = PurePath(download_path).joinpath('.song_ids')
+    if not Path(hidden_file_path).is_file():
         with open(hidden_file_path, 'w', encoding='utf-8') as f:
             pass
 
@@ -37,7 +38,7 @@ def get_previously_downloaded() -> List[str]:
     ids = []
     archive_path = Zotify.CONFIG.get_song_archive()
 
-    if os.path.exists(archive_path):
+    if Path(archive_path).exists():
         with open(archive_path, 'r', encoding='utf-8') as f:
             ids = [line.strip().split('\t')[0] for line in f.readlines()]
 
@@ -49,7 +50,7 @@ def add_to_archive(song_id: str, filename: str, author_name: str, song_name: str
 
     archive_path = Zotify.CONFIG.get_song_archive()
 
-    if os.path.exists(archive_path):
+    if Path(archive_path).exists():
         with open(archive_path, 'a', encoding='utf-8') as file:
             file.write(f'{song_id}\t{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\t{author_name}\t{song_name}\t{filename}\n')
     else:
@@ -62,8 +63,8 @@ def get_directory_song_ids(download_path: str) -> List[str]:
 
     song_ids = []
 
-    hidden_file_path = os.path.join(download_path, '.song_ids')
-    if os.path.isfile(hidden_file_path):
+    hidden_file_path = PurePath(download_path).joinpath('.song_ids')
+    if Path(hidden_file_path).is_file():
         with open(hidden_file_path, 'r', encoding='utf-8') as file:
             song_ids.extend([line.strip().split('\t')[0] for line in file.readlines()])
 
@@ -73,7 +74,7 @@ def get_directory_song_ids(download_path: str) -> List[str]:
 def add_to_directory_song_ids(download_path: str, song_id: str, filename: str, author_name: str, song_name: str) -> None:
     """ Appends song_id to .song_ids file in directory """
 
-    hidden_file_path = os.path.join(download_path, '.song_ids')
+    hidden_file_path = PurePath(download_path).joinpath('.song_ids')
     # not checking if file exists because we need an exception
     # to be raised if something is wrong
     with open(hidden_file_path, 'a', encoding='utf-8') as file:
@@ -108,11 +109,12 @@ def split_input(selection) -> List[str]:
 def splash() -> str:
     """ Displays splash screen """
     return """
-███████  ██████  ████████ ██ ███████ ██    ██
-   ███  ██    ██    ██    ██ ██       ██  ██
-  ███   ██    ██    ██    ██ █████     ████
- ███    ██    ██    ██    ██ ██         ██
-███████  ██████     ██    ██ ██         ██
+███████╗ ██████╗ ████████╗██╗███████╗██╗   ██╗
+╚══███╔╝██╔═══██╗╚══██╔══╝██║██╔════╝╚██╗ ██╔╝
+  ███╔╝ ██║   ██║   ██║   ██║█████╗   ╚████╔╝ 
+ ███╔╝  ██║   ██║   ██║   ██║██╔══╝    ╚██╔╝  
+███████╗╚██████╔╝   ██║   ██║██║        ██║   
+╚══════╝ ╚═════╝    ╚═╝   ╚═╝╚═╝        ╚═╝   
     """
 
 
@@ -280,5 +282,3 @@ def fmt_seconds(secs: float) -> str:
         return f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
     else:
         return f'{h}'.zfill(2) + ':' + f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
-
-
