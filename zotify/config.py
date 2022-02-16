@@ -33,6 +33,7 @@ PRINT_PROGRESS_INFO = 'PRINT_PROGRESS_INFO'
 PRINT_WARNINGS = 'PRINT_WARNINGS'
 RETRY_ATTEMPTS = 'RETRY_ATTEMPTS'
 CONFIG_VERSION = 'CONFIG_VERSION'
+DOWNLOAD_LYRICS = 'DOWNLOAD_LYRICS'
 
 CONFIG_VALUES = {
     CREDENTIALS_LOCATION:       { 'default': '',      'type': str,  'arg': '--credentials-location'       },
@@ -41,6 +42,7 @@ CONFIG_VALUES = {
     ROOT_PATH:                  { 'default': '',      'type': str,  'arg': '--root-path'                  },
     ROOT_PODCAST_PATH:          { 'default': '',      'type': str,  'arg': '--root-podcast-path'          },
     SPLIT_ALBUM_DISCS:          { 'default': 'False', 'type': bool, 'arg': '--split-album-discs'          },
+    DOWNLOAD_LYRICS:            { 'default': 'True',  'type': bool, 'arg': '--download-lyrics'            },
     MD_ALLGENRES:               { 'default': 'False', 'type': bool, 'arg': '--md-allgenres'               },
     MD_GENREDELIMITER:          { 'default': ',',     'type': str,  'arg': '--md-genredelimiter'          },
     DOWNLOAD_FORMAT:            { 'default': 'ogg',   'type': str,  'arg': '--download-format'            },
@@ -186,6 +188,10 @@ class Config:
     @classmethod
     def get_download_format(cls) -> str:
         return cls.get(DOWNLOAD_FORMAT)
+
+    @classmethod
+    def get_download_lyrics(cls) -> bool:
+        return cls.get(DOWNLOAD_LYRICS)
 
     @classmethod
     def get_bulk_wait_time(cls) -> int:

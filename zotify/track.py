@@ -1,10 +1,10 @@
 from pathlib import Path, PurePath
+import math
 import re
 import time
 import uuid
 from typing import Any, Tuple, List
 
-from librespot.audio.decoders import AudioQuality
 from librespot.metadata import TrackId
 import ffmpy
 
@@ -64,7 +64,6 @@ def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, An
 
 
 def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
-
     try:
         genres = []
         for data in rawartists:
@@ -86,6 +85,26 @@ def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
         raise ValueError(f'Failed to parse GENRES response: {str(e)}\n{raw}')
 
 
+def get_song_lyrics(song_id: str, file_save: str) -> None:
+    raw, lyrics = Zotify.invoke_url(f'https://spclient.wg.spotify.com/color-lyrics/v2/track/{song_id}')
+
+    formatted_lyrics = lyrics['lyrics']['lines']
+    if(lyrics['lyrics']['syncType'] == "UNSYNCED"):
+        with open(file_save, 'w') as file:
+            for line in formatted_lyrics:
+                file.writelines(line['words'] + '\n')
+    elif(lyrics['lyrics']['syncType'] == "LINE_SYNCED"):
+        with open(file_save, 'w') as file:
+            for line in formatted_lyrics:
+                timestamp = int(line['startTimeMs'])
+                ts_minutes = str(math.floor(timestamp / 60000)).zfill(2)
+                ts_seconds = str(math.floor((timestamp % 60000) / 1000)).zfill(2)
+                ts_millis = str(math.floor(timestamp % 1000))[:2].zfill(2)
+                file.writelines(f'[{ts_minutes}:{ts_seconds}.{ts_millis}]' + line['words'] + '\n')
+    else:
+        raise ValueError(f'Filed to fetch lyrics: {song_id}')
+
+
 def get_song_duration(song_id: str) -> float:
     """ Retrieves duration of song in second as is on spotify """
 
@@ -96,14 +115,9 @@ def get_song_duration(song_id: str) -> float:
     # convert to seconds
     duration = float(ms_duration)/1000
 
-    # debug
-    # print(duration)
-    # print(type(duration))
-
     return duration
 
 
-# noinspection PyBroadException
 def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=False) -> None:
     """ Downloads raw song audio from Spotify """
 
@@ -182,8 +196,8 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                 else:
                     if track_id != scraped_song_id:
                         track_id = scraped_song_id
-                    track_id = TrackId.from_base62(track_id)
-                    stream = Zotify.get_content_stream(track_id, Zotify.DOWNLOAD_QUALITY)
+                    track = TrackId.from_base62(track_id)
+                    stream = Zotify.get_content_stream(track, Zotify.DOWNLOAD_QUALITY)
                     create_download_directory(filedir)
                     total_size = stream.input_stream.size
 
@@ -213,6 +227,8 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
                     genres = get_song_genres(raw_artists, name)
 
+                    if(Zotify.CONFIG.get_download_lyrics()):
+                        get_song_lyrics(track_id, PurePath(filedir / str(song_name + '.lrc')))
                     convert_audio_format(filename_temp)
                     set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
                     set_music_thumbnail(filename_temp, image_url)

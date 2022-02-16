@@ -64,9 +64,10 @@ def client(args) -> None:
             search_text = ''
             while len(search_text) == 0:
                 search_text = input('Enter search or URL: ')
-
-        if not download_from_urls([args.search]):
-            search(args.search)
+            search(search_text)
+        else:
+            if not download_from_urls([args.search]):
+                search(args.search)
 
 def download_from_urls(urls: list[str]) -> bool:
     """ Downloads from a list of urls """
