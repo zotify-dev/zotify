@@ -1,6 +1,6 @@
 FROM python:3.9-alpine as base
 
-RUN apk --update add git ffmpeg
+RUN apk --update add ffmpeg
 
 FROM base as builder
 RUN mkdir /install
@@ -13,6 +13,6 @@ RUN apk add gcc libc-dev zlib zlib-dev jpeg-dev \
 FROM base
 
 COPY --from=builder /install /usr/local
-COPY zotify /app
+COPY zotify /app/zotify
 WORKDIR /app
-ENTRYPOINT ["/usr/local/bin/python", "__main__.py"]
+ENTRYPOINT ["python3", "-m", "zotify"]
