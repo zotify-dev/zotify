@@ -99,7 +99,7 @@ def download_episode(episode_id) -> None:
 
             filepath = PurePath(download_directory).joinpath(f"{filename}.ogg")
             if (
-                Path(filepath).isfile()
+                Path(filepath).is_file()
                 and Path(filepath).stat().st_size == total_size
                 and Zotify.CONFIG.get_skip_existing()
             ):
