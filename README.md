@@ -63,6 +63,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | ROOT_PATH                    | --root-path                      | Directory where Zotify saves music
 | ROOT_PODCAST_PATH            | --root-podcast-path              | Directory where Zotify saves podcasts
 | SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
+| DOWNLOAD_LYRICS              | --download-lyrics                | Downloads synced lyrics in .lrc format, uses unsynced as fallback.
 | MD_ALLGENRES                 | --md-allgenres                   | Save all relevant genres in metadata
 | MD_GENREDELIMITER            | --md-genredelimiter              | Delimiter character used to split genres in metadata
 | DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)

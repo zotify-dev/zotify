@@ -1,4 +1,9 @@
 # Changelog
+
+## v0.6.1
+- Added support for synced lyrics (unsynced is synced unavailable)
+- Can be configured with the `DOWNLOAD_LYRICS` option in config.json or `--download-lyrics=True/False` as a command line argument
+
 ## v0.6
 **General changes**
 - Added "DOWNLOAD_QUALITY" config option. This can be "normal" (96kbks), "high" (160kpbs), "very-high" (320kpbs, premium only) or "auto" which selects the highest format available for your account automatically.
