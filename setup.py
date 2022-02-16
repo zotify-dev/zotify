@@ -12,7 +12,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="zotify",
-    version="0.6.0",
+    version="0.6.1",
     author="Zotify Contributors",
     description="A music and podcast downloader.",
     long_description=README,
