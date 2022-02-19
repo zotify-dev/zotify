@@ -18,6 +18,7 @@ LANGUAGE = 'LANGUAGE'
 DOWNLOAD_QUALITY = 'DOWNLOAD_QUALITY'
 TRANSCODE_BITRATE = 'TRANSCODE_BITRATE'
 SONG_ARCHIVE = 'SONG_ARCHIVE'
+SAVE_CREDENTIALS = 'SAVE_CREDENTIALS'
 CREDENTIALS_LOCATION = 'CREDENTIALS_LOCATION'
 OUTPUT = 'OUTPUT'
 PRINT_SPLASH = 'PRINT_SPLASH'
@@ -27,6 +28,7 @@ PRINT_ERRORS = 'PRINT_ERRORS'
 PRINT_DOWNLOADS = 'PRINT_DOWNLOADS'
 PRINT_API_ERRORS = 'PRINT_API_ERRORS'
 TEMP_DOWNLOAD_DIR = 'TEMP_DOWNLOAD_DIR'
+MD_SAVE_GENRES = 'MD_SAVE_GENRES'
 MD_ALLGENRES = 'MD_ALLGENRES'
 MD_GENREDELIMITER = 'MD_GENREDELIMITER'
 PRINT_PROGRESS_INFO = 'PRINT_PROGRESS_INFO'
@@ -36,6 +38,7 @@ CONFIG_VERSION = 'CONFIG_VERSION'
 DOWNLOAD_LYRICS = 'DOWNLOAD_LYRICS'
 
 CONFIG_VALUES = {
+    SAVE_CREDENTIALS:           { 'default': 'True',  'type': bool, 'arg': '--save-credentials'           },
     CREDENTIALS_LOCATION:       { 'default': '',      'type': str,  'arg': '--credentials-location'       },
     OUTPUT:                     { 'default': '',      'type': str,  'arg': '--output'                     },
     SONG_ARCHIVE:               { 'default': '',      'type': str,  'arg': '--song-archive'               },
@@ -43,6 +46,7 @@ CONFIG_VALUES = {
     ROOT_PODCAST_PATH:          { 'default': '',      'type': str,  'arg': '--root-podcast-path'          },
     SPLIT_ALBUM_DISCS:          { 'default': 'False', 'type': bool, 'arg': '--split-album-discs'          },
     DOWNLOAD_LYRICS:            { 'default': 'True',  'type': bool, 'arg': '--download-lyrics'            },
+    MD_SAVE_GENRES:             { 'default': 'False', 'type': bool, 'arg': '--md-save-genres'             },
     MD_ALLGENRES:               { 'default': 'False', 'type': bool, 'arg': '--md-allgenres'               },
     MD_GENREDELIMITER:          { 'default': ',',     'type': str,  'arg': '--md-genredelimiter'          },
     DOWNLOAD_FORMAT:            { 'default': 'ogg',   'type': str,  'arg': '--download-format'            },
@@ -70,7 +74,7 @@ CONFIG_VALUES = {
 OUTPUT_DEFAULT_PLAYLIST = '{playlist}/{artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_PLAYLIST_EXT = '{playlist}/{playlist_num} - {artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_LIKED_SONGS = 'Liked Songs/{artist} - {song_name}.{ext}'
-OUTPUT_DEFAULT_SINGLE = '{artist}/{song_name}/{artist} - {song_name}.{ext}'
+OUTPUT_DEFAULT_SINGLE = '{artist}/Single - {song_name}/{artist} - {song_name}.{ext}'
 OUTPUT_DEFAULT_ALBUM = '{artist}/{album}/{album_num} - {artist} - {song_name}.{ext}'
 
 
@@ -231,6 +235,10 @@ class Config:
         return song_archive
 
     @classmethod
+    def get_save_credentials(cls) -> bool:
+        return cls.get(SAVE_CREDENTIALS)
+
+    @classmethod
     def get_credentials_location(cls) -> str:
         if cls.get(CREDENTIALS_LOCATION) == '':
             system_paths = {
@@ -252,6 +260,10 @@ class Config:
         if cls.get(TEMP_DOWNLOAD_DIR) == '':
             return ''
         return PurePath(cls.get_root_path()).joinpath(cls.get(TEMP_DOWNLOAD_DIR))
+
+    @classmethod
+    def get_save_genres(cls) -> bool:
+        return cls.get(MD_SAVE_GENRES)
     
     @classmethod
     def get_all_genres(cls) -> bool:

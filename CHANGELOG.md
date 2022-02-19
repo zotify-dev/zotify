@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.2
+- Won't crash if downloading a song with no lyrics and `DOWNLOAD_LYRICS` is set to True
+- Fixed visual glitch when entering login info
+- Saving genre metadata is now optional (disabled by default) and configurable with the `MD_SAVE_GENRES`/`--md-save-genres` option
+- Switched to new loading animation that hopefully renders a little better in Windows command shells
+- Username and password can now be entered as arguments with `--username` and `--password` - does **not** take priority over credentials.json
+- Added option to disable saving credentials `SAVE_CREDENTIALS`/`--save-credentials` - will still use credentials.json if already exists
+- Default output format for singles is now `{artist}/Single - {song_name}/{artist} - {song_name}.{ext}`
+
 ## v0.6.1
 - Added support for synced lyrics (unsynced is synced unavailable)
 - Can be configured with the `DOWNLOAD_LYRICS` option in config.json or `--download-lyrics=True/False` as a command line argument

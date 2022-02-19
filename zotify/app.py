@@ -18,10 +18,7 @@ SEARCH_URL = 'https://api.spotify.com/v1/search'
 
 def client(args) -> None:
     """ Connects to download server to perform query's and get songs to download """
-    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Signing in...")
-    prepare_download_loader.start()
     Zotify(args)
-    prepare_download_loader.stop()
 
     Printer.print(PrintChannel.SPLASH, splash())
 

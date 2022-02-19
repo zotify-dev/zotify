@@ -17,10 +17,10 @@ class Zotify:
 
     def __init__(self, args):
         Zotify.CONFIG.load(args)
-        Zotify.login()
+        Zotify.login(args)
 
     @classmethod
-    def login(cls):
+    def login(cls, args):
         """ Authenticates with Spotify and saves credentials to a file """
 
         cred_location = Config.get_credentials_location()
@@ -33,12 +33,15 @@ class Zotify:
             except RuntimeError:
                 pass
         while True:
-            user_name = ''
+            user_name = args.username if args.username else ''
             while len(user_name) == 0:
                 user_name = input('Username: ')
-            password = pwinput(prompt='Password: ', mask='*')
+            password = args.password if args.password else pwinput(prompt='Password: ', mask='*')
             try:
-                conf = Session.Configuration.Builder().set_stored_credential_file(cred_location).build()
+                if Config.get_save_credentials():
+                    conf = Session.Configuration.Builder().set_stored_credential_file(cred_location).build()
+                else:
+                    conf = Session.Configuration.Builder().set_store_credentials(False).build()
                 cls.SESSION = Session.Builder(conf).user_pass(user_name, password).create()
                 return
             except RuntimeError:

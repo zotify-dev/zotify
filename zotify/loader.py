@@ -19,7 +19,7 @@ class Loader:
         # do something
         pass
     """
-    def __init__(self, chan, desc="Loading...", end='', timeout=0.1, mode='std1'):
+    def __init__(self, chan, desc="Loading...", end='', timeout=0.1, mode='prog'):
         """
         A loader-like context manager
 

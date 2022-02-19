@@ -64,45 +64,50 @@ def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, An
 
 
 def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
-    try:
-        genres = []
-        for data in rawartists:
-            # query artist genres via href, which will be the api url
-            with Loader(PrintChannel.PROGRESS_INFO, "Fetching artist information..."):
-                (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
-            if Zotify.CONFIG.get_all_genres() and len(artistInfo[GENRES]) > 0:
-                for genre in artistInfo[GENRES]:
-                    genres.append(genre)
-            elif len(artistInfo[GENRES]) > 0:
-                genres.append(artistInfo[GENRES][0])
+    if Zotify.CONFIG.get_save_genres():
+        try:
+            genres = []
+            for data in rawartists:
+                # query artist genres via href, which will be the api url
+                with Loader(PrintChannel.PROGRESS_INFO, "Fetching artist information..."):
+                    (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
+                if Zotify.CONFIG.get_all_genres() and len(artistInfo[GENRES]) > 0:
+                    for genre in artistInfo[GENRES]:
+                        genres.append(genre)
+                elif len(artistInfo[GENRES]) > 0:
+                    genres.append(artistInfo[GENRES][0])
 
-        if len(genres) == 0:
-            Printer.print(PrintChannel.WARNINGS, '###    No Genres found for song ' + track_name)
-            genres.append('')
+            if len(genres) == 0:
+                Printer.print(PrintChannel.WARNINGS, '###    No Genres found for song ' + track_name)
+                genres.append('')
 
-        return genres
-    except Exception as e:
-        raise ValueError(f'Failed to parse GENRES response: {str(e)}\n{raw}')
+            return genres
+        except Exception as e:
+            raise ValueError(f'Failed to parse GENRES response: {str(e)}\n{raw}')
+    else:
+        return ['']
 
 
 def get_song_lyrics(song_id: str, file_save: str) -> None:
     raw, lyrics = Zotify.invoke_url(f'https://spclient.wg.spotify.com/color-lyrics/v2/track/{song_id}')
 
-    formatted_lyrics = lyrics['lyrics']['lines']
-    if(lyrics['lyrics']['syncType'] == "UNSYNCED"):
-        with open(file_save, 'w') as file:
-            for line in formatted_lyrics:
-                file.writelines(line['words'] + '\n')
-    elif(lyrics['lyrics']['syncType'] == "LINE_SYNCED"):
-        with open(file_save, 'w') as file:
-            for line in formatted_lyrics:
-                timestamp = int(line['startTimeMs'])
-                ts_minutes = str(math.floor(timestamp / 60000)).zfill(2)
-                ts_seconds = str(math.floor((timestamp % 60000) / 1000)).zfill(2)
-                ts_millis = str(math.floor(timestamp % 1000))[:2].zfill(2)
-                file.writelines(f'[{ts_minutes}:{ts_seconds}.{ts_millis}]' + line['words'] + '\n')
-    else:
-        raise ValueError(f'Filed to fetch lyrics: {song_id}')
+    if lyrics:
+        formatted_lyrics = lyrics['lyrics']['lines']
+        if(lyrics['lyrics']['syncType'] == "UNSYNCED"):
+            with open(file_save, 'w') as file:
+                for line in formatted_lyrics:
+                    file.writelines(line['words'] + '\n')
+            return
+        elif(lyrics['lyrics']['syncType'] == "LINE_SYNCED"):
+            with open(file_save, 'w') as file:
+                for line in formatted_lyrics:
+                    timestamp = int(line['startTimeMs'])
+                    ts_minutes = str(math.floor(timestamp / 60000)).zfill(2)
+                    ts_seconds = str(math.floor((timestamp % 60000) / 1000)).zfill(2)
+                    ts_millis = str(math.floor(timestamp % 1000))[:2].zfill(2)
+                    file.writelines(f'[{ts_minutes}:{ts_seconds}.{ts_millis}]' + line['words'] + '\n')
+            return
+    raise ValueError(f'Filed to fetch lyrics: {song_id}')
 
 
 def get_song_duration(song_id: str) -> float:
@@ -228,7 +233,10 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     genres = get_song_genres(raw_artists, name)
 
                     if(Zotify.CONFIG.get_download_lyrics()):
-                        get_song_lyrics(track_id, PurePath(filedir / str(song_name + '.lrc')))
+                        try:
+                            get_song_lyrics(track_id, PurePath(filedir / str(song_name + '.lrc')))
+                        except ValueError:
+                            Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
                     convert_audio_format(filename_temp)
                     set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
                     set_music_thumbnail(filename_temp, image_url)
@@ -299,4 +307,4 @@ def convert_audio_format(filename) -> None:
             Path(temp_filename).unlink()
 
     except ffmpy.FFExecutableNotFoundError:
-        Printer.print(PrintChannel.ERRORS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
+        Printer.print(PrintChannel.WARNINGS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
