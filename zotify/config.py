@@ -54,7 +54,7 @@ CONFIG_VALUES = {
     TRANSCODE_BITRATE:          { 'default': 'auto',  'type': str,  'arg': '--transcode-bitrate'          },
     SKIP_EXISTING:              { 'default': 'True',  'type': bool, 'arg': '--skip-existing'              },
     SKIP_PREVIOUSLY_DOWNLOADED: { 'default': 'False', 'type': bool, 'arg': '--skip-previously-downloaded' },
-    RETRY_ATTEMPTS:             { 'default': '5',     'type': int,  'arg': '--retry-attemps'              },
+    RETRY_ATTEMPTS:             { 'default': '1',     'type': int,  'arg': '--retry-attemps'              },
     BULK_WAIT_TIME:             { 'default': '1',     'type': int,  'arg': '--bulk-wait-time'             },
     OVERRIDE_AUTO_WAIT:         { 'default': 'False', 'type': bool, 'arg': '--override-auto-wait'         },
     CHUNK_SIZE:                 { 'default': '50000', 'type': int,  'arg': '--chunk-size'                 },

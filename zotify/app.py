@@ -41,13 +41,16 @@ def client(args) -> None:
 
         else:
             Printer.print(PrintChannel.ERRORS, f'File {filename} not found.\n')
+        return
 
     if args.urls:
         if len(args.urls) > 0:
             download_from_urls(args.urls)
+        return
 
     if args.playlist:
         download_from_user_playlist()
+        return
 
     if args.liked_songs:
         for song in get_saved_tracks():
@@ -55,6 +58,7 @@ def client(args) -> None:
                 Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
             else:
                 download_track('liked', song[TRACK][ID])
+        return
 
     if args.search:
         if args.search == ' ':
@@ -65,6 +69,13 @@ def client(args) -> None:
         else:
             if not download_from_urls([args.search]):
                 search(args.search)
+        return
+
+    else:
+        search_text = ''
+        while len(search_text) == 0:
+            search_text = input('Enter search or URL: ')
+        search(search_text)
 
 def download_from_urls(urls: list[str]) -> bool:
     """ Downloads from a list of urls """

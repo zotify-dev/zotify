@@ -3,6 +3,7 @@
 ## 0.6.3
 - Less stupid single format
 - Fixed error in json fetching
+- Default to search if no other option is provided
 
 ## v0.6.2
 - Won't crash if downloading a song with no lyrics and `DOWNLOAD_LYRICS` is set to True

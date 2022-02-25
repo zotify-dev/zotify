@@ -25,7 +25,7 @@ def main():
     parser.add_argument('--password',
                         type=str,
                         help='Account password')
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('urls',
                        type=str,
                        # action='extend',
