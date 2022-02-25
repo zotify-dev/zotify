@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from pwinput import pwinput
 import time
@@ -88,10 +89,10 @@ class Zotify:
         responsetext = response.text
         try:
             responsejson = response.json()
-        except requests.exceptions.JSONDecodeError:
-            responsejson = {}
+        except json.decoder.JSONDecodeError:
+            responsejson = {"error": {"status": "unknown", "message": "received an empty response"}}
 
-        if 'error' in responsejson:
+        if not responsejson or 'error' in responsejson:
             if tryCount < (cls.CONFIG.get_retry_attempts() - 1):
                 Printer.print(PrintChannel.WARNINGS, f"Spotify API Error (try {tryCount + 1}) ({responsejson['error']['status']}): {responsejson['error']['message']}")
                 time.sleep(5)

@@ -92,7 +92,10 @@ def get_song_lyrics(song_id: str, file_save: str) -> None:
     raw, lyrics = Zotify.invoke_url(f'https://spclient.wg.spotify.com/color-lyrics/v2/track/{song_id}')
 
     if lyrics:
-        formatted_lyrics = lyrics['lyrics']['lines']
+        try:
+            formatted_lyrics = lyrics['lyrics']['lines']
+        except KeyError:
+            raise ValueError(f'Failed to fetch lyrics: {song_id}')
         if(lyrics['lyrics']['syncType'] == "UNSYNCED"):
             with open(file_save, 'w') as file:
                 for line in formatted_lyrics:
@@ -107,7 +110,7 @@ def get_song_lyrics(song_id: str, file_save: str) -> None:
                     ts_millis = str(math.floor(timestamp % 1000))[:2].zfill(2)
                     file.writelines(f'[{ts_minutes}:{ts_seconds}.{ts_millis}]' + line['words'] + '\n')
             return
-    raise ValueError(f'Filed to fetch lyrics: {song_id}')
+    raise ValueError(f'Failed to fetch lyrics: {song_id}')
 
 
 def get_song_duration(song_id: str) -> float:
