@@ -221,7 +221,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                             unit_divisor=1024,
                             disable=disable_progressbar
                     ) as p_bar:
-                        for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 1):
+                        for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 2):
                             data = stream.input_stream.stream().read(Zotify.CONFIG.get_chunk_size())
                             p_bar.update(file.write(data))
                             downloaded += len(data)

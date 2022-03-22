@@ -57,7 +57,7 @@ CONFIG_VALUES = {
     RETRY_ATTEMPTS:             { 'default': '1',     'type': int,  'arg': '--retry-attemps'              },
     BULK_WAIT_TIME:             { 'default': '1',     'type': int,  'arg': '--bulk-wait-time'             },
     OVERRIDE_AUTO_WAIT:         { 'default': 'False', 'type': bool, 'arg': '--override-auto-wait'         },
-    CHUNK_SIZE:                 { 'default': '50000', 'type': int,  'arg': '--chunk-size'                 },
+    CHUNK_SIZE:                 { 'default': '20000', 'type': int,  'arg': '--chunk-size'                 },
     DOWNLOAD_REAL_TIME:         { 'default': 'False', 'type': bool, 'arg': '--download-real-time'         },
     LANGUAGE:                   { 'default': 'en',    'type': str,  'arg': '--language'                   },
     PRINT_SPLASH:               { 'default': 'False', 'type': bool, 'arg': '--print-splash'               },

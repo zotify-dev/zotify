@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.4
+- Fixed upstream bug causing tracks to not download fully
+
 ## 0.6.3
 - Less stupid single format
 - Fixed error in json fetching

@@ -118,7 +118,7 @@ def download_episode(episode_id) -> None:
                 unit_divisor=1024
             ) as p_bar:
                 prepare_download_loader.stop()
-                for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 1):
+                for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 2):
                     data = stream.input_stream.stream().read(Zotify.CONFIG.get_chunk_size())
                     p_bar.update(file.write(data))
                     downloaded += len(data)
