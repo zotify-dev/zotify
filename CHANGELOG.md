@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.5
+- Implemented more stable fix for bug still persisting after v0.6.4
+
 ## v0.6.4
 - Fixed upstream bug causing tracks to not download fully
 
