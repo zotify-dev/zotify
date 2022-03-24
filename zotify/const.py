@@ -1,3 +1,5 @@
+FOLLOWED_ARTISTS_URL = 'https://api.spotify.com/v1/me/following?type=artist'
+
 SAVED_TRACKS_URL = 'https://api.spotify.com/v1/me/tracks'
 
 TRACKS_URL = 'https://api.spotify.com/v1/tracks'

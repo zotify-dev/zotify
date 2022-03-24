@@ -9,7 +9,8 @@ from librespot.metadata import TrackId
 import ffmpy
 
 from zotify.const import TRACKS, ALBUM, GENRES, NAME, ITEMS, DISC_NUMBER, TRACK_NUMBER, IS_PLAYABLE, ARTISTS, IMAGES, URL, \
-    RELEASE_DATE, ID, TRACKS_URL, SAVED_TRACKS_URL, TRACK_STATS_URL, CODEC_MAP, EXT_MAP, DURATION_MS, HREF
+    RELEASE_DATE, ID, TRACKS_URL, FOLLOWED_ARTISTS_URL, SAVED_TRACKS_URL, TRACK_STATS_URL, CODEC_MAP, EXT_MAP, DURATION_MS, \
+    HREF, ARTISTS
 from zotify.termoutput import Printer, PrintChannel
 from zotify.utils import fix_filename, set_audio_tags, set_music_thumbnail, create_download_directory, \
     get_directory_song_ids, add_to_directory_song_ids, get_previously_downloaded, add_to_archive, fmt_seconds
@@ -33,6 +34,16 @@ def get_saved_tracks() -> list:
             break
 
     return songs
+
+
+def get_followed_artists() -> list:
+    """ Returns user's followed artists """
+    artists = []
+    resp = Zotify.invoke_url(FOLLOWED_ARTISTS_URL)[1]
+    for artist in resp[ARTISTS][ITEMS]:
+        artists.append(artist[ID])
+    
+    return artists
 
 
 def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, Any, Any, Any, Any, int]:

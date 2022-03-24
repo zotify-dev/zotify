@@ -36,6 +36,10 @@ def main():
                        dest='liked_songs',
                        action='store_true',
                        help='Downloads all the liked songs from your account.')
+    group.add_argument('-f', '--followed',
+                       dest='followed_artists',
+                       action='store_true',
+                       help='Downloads all the songs from all your followed artists.')
     group.add_argument('-p', '--playlist',
                        action='store_true',
                        help='Downloads a saved playlist from your account.')

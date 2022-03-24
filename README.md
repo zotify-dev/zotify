@@ -48,6 +48,7 @@ Basic options:
   -d, --download   Download all tracks/alumbs/playlists URLs from the specified file
   -p, --playlist   Downloads a saved playlist from your account
   -l, --liked      Downloads all the liked songs from your account
+  -f, --followed   Downloads all songs by all artists you follow
   -s, --search     Searches for specified track, album, artist or playlist, loads search prompt if none are given.
 ```
 
