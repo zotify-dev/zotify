@@ -9,7 +9,7 @@ from zotify.loader import Loader
 from zotify.playlist import get_playlist_songs, get_playlist_info, download_from_user_playlist, download_playlist
 from zotify.podcast import download_episode, get_show_episodes
 from zotify.termoutput import Printer, PrintChannel
-from zotify.track import download_track, get_saved_tracks
+from zotify.track import download_track, get_saved_tracks, get_followed_artists
 from zotify.utils import splash, split_input, regex_input_for_urls
 from zotify.zotify import Zotify
 
@@ -59,12 +59,17 @@ def client(args) -> None:
             else:
                 download_track('liked', song[TRACK][ID])
         return
+    
+    if args.followed_artists:
+        for artist in get_followed_artists():
+            download_artist_albums(artist)
+        return
 
     if args.search:
         if args.search == ' ':
             search_text = ''
             while len(search_text) == 0:
-                search_text = input('Enter search or URL: ')
+                search_text = input('Enter search: ')
             search(search_text)
         else:
             if not download_from_urls([args.search]):
@@ -74,7 +79,7 @@ def client(args) -> None:
     else:
         search_text = ''
         while len(search_text) == 0:
-            search_text = input('Enter search or URL: ')
+            search_text = input('Enter search: ')
         search(search_text)
 
 def download_from_urls(urls: list[str]) -> bool:

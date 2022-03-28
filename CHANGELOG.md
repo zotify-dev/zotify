@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.6.6
+- Added `-f` / `--followed` option to download every song by all of your followed artists
+
 ## v0.6.5
 - Implemented more stable fix for bug still persisting after v0.6.4
 
