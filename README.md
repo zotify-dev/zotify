@@ -6,8 +6,6 @@
   <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
 </p>
 
-[Discord Server](https://discord.gg/XDYsFRTUjE)
-
 ### Featues
   - Downloads at up to 320kbps*
   - Downloads directly from the source**
@@ -69,7 +67,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | MD_ALLGENRES                 | --md-allgenres                   | Save all relevant genres in metadata
 | MD_GENREDELIMITER            | --md-genredelimiter              | Delimiter character used to split genres in metadata
 | DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
-| DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very-high*)
+| DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very_high*)
 | TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
 | SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
 | SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
