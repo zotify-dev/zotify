@@ -145,11 +145,8 @@ cython_debug/
 .vscode/
 .idea/
 
-# Credentials
-credentials.json
-
-# Config file
-zconfig.json
+# Configuration
+.zotify/
 
 #Download Folder
 Zotify\ Music/
