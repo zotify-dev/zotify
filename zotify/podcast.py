@@ -83,14 +83,15 @@ def download_episode(episode_id) -> None:
     else:
         filename = podcast_name + ' - ' + episode_name
 
-        direct_download_url = Zotify.invoke_url(
-            'https://api-partner.spotify.com/pathfinder/v1/query?operationName=getEpisode&variables={"uri":"spotify:episode:' + episode_id + '"}&extensions={"persistedQuery":{"version":1,"sha256Hash":"224ba0fd89fcfdfb3a15fa2d82a6112d3f4e2ac88fba5c6713de04d1b72cf482"}}')[1]["data"]["episode"]["audio"]["items"][-1]["url"]
+        resp = Zotify.invoke_url(
+            'https://api-partner.spotify.com/pathfinder/v1/query?operationName=getEpisode&variables={"uri":"spotify:episode:' + episode_id + '"}&extensions={"persistedQuery":{"version":1,"sha256Hash":"224ba0fd89fcfdfb3a15fa2d82a6112d3f4e2ac88fba5c6713de04d1b72cf482"}}')[1]["data"]["episode"]
+        direct_download_url = resp["audio"]["items"][-1]["url"]
 
         download_directory = PurePath(Zotify.CONFIG.get_root_podcast_path()).joinpath(extra_paths)
         # download_directory = os.path.realpath(download_directory)
         create_download_directory(download_directory)
 
-        if "anon-podcast.scdn.co" in direct_download_url:
+        if "anon-podcast.scdn.co" in direct_download_url or "audio_preview_url" not in resp:
             episode_id = EpisodeId.from_base62(episode_id)
             stream = Zotify.get_content_stream(
                 episode_id, Zotify.DOWNLOAD_QUALITY)
