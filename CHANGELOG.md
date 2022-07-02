@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.8
+- Improve check for direct download availability of podcasts
+
+## 0.6.7
+- Temporary fix for upstream protobuf error
+
 ## v0.6.6
 - Added `-f` / `--followed` option to download every song by all of your followed artists
 
