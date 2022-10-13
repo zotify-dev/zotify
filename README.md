@@ -30,7 +30,7 @@ Dependencies:
 
 Installation:
 
-python -m pip install https://gitlab.com/team-zotify/zotify/-/archive/main/zotify-main.zip
+python -m pip install git+https://zotify.xyz/zotify/zotify.git
 ```
 
 \*Zotify will work without FFmpeg but transcoding will be unavailable.
