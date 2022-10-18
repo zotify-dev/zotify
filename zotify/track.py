@@ -61,7 +61,7 @@ def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, An
 
         album_name = info[TRACKS][0][ALBUM][NAME]
         name = info[TRACKS][0][NAME]
-        image_url = info[TRACKS][0][ALBUM][IMAGES][0][URL]
+        image_url = info[TRACKS][0][ALBUM][IMAGES][2][URL]
         release_year = info[TRACKS][0][ALBUM][RELEASE_DATE].split('-')[0]
         disc_number = info[TRACKS][0][DISC_NUMBER]
         track_number = info[TRACKS][0][TRACK_NUMBER]
