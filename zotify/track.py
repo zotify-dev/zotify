@@ -255,8 +255,11 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         except ValueError:
                             Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
                     convert_audio_format(filename_temp)
-                    set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
-                    set_music_thumbnail(filename_temp, image_url)
+                    try:
+                        set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
+                        set_music_thumbnail(filename_temp, image_url)
+                    except Exception:
+                        Printer.print(PrintChannel.ERRORS, "Unable to write metadata, ensure ffmpeg is installed and added to your PATH.")
 
                     if filename_temp != filename:
                         Path(filename_temp).rename(filename)

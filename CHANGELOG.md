@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.9
+- Fix low resolution cover art
+- Fix crash when missing ffmpeg
+
 ## 0.6.8
 - Improve check for direct download availability of podcasts
 

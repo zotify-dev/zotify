@@ -26,14 +26,12 @@
 Dependencies:
 
 - Python 3.9 or greater
-- FFmpeg*
+- FFmpeg
 
 Installation:
 
 python -m pip install git+https://zotify.xyz/zotify/zotify.git
 ```
-
-\*Zotify will work without FFmpeg but transcoding will be unavailable.
 
 ### Command line usage
 
