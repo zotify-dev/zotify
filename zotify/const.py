@@ -80,6 +80,8 @@ TYPE = 'type'
 
 PREMIUM = 'premium'
 
+WIDTH = 'width'
+
 USER_READ_EMAIL = 'user-read-email'
 
 PLAYLIST_READ_PRIVATE = 'playlist-read-private'

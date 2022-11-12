@@ -10,7 +10,7 @@ import ffmpy
 
 from zotify.const import TRACKS, ALBUM, GENRES, NAME, ITEMS, DISC_NUMBER, TRACK_NUMBER, IS_PLAYABLE, ARTISTS, IMAGES, URL, \
     RELEASE_DATE, ID, TRACKS_URL, FOLLOWED_ARTISTS_URL, SAVED_TRACKS_URL, TRACK_STATS_URL, CODEC_MAP, EXT_MAP, DURATION_MS, \
-    HREF, ARTISTS
+    HREF, ARTISTS, WIDTH
 from zotify.termoutput import Printer, PrintChannel
 from zotify.utils import fix_filename, set_audio_tags, set_music_thumbnail, create_download_directory, \
     get_directory_song_ids, add_to_directory_song_ids, get_previously_downloaded, add_to_archive, fmt_seconds
@@ -61,13 +61,18 @@ def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, An
 
         album_name = info[TRACKS][0][ALBUM][NAME]
         name = info[TRACKS][0][NAME]
-        image_url = info[TRACKS][0][ALBUM][IMAGES][2][URL]
         release_year = info[TRACKS][0][ALBUM][RELEASE_DATE].split('-')[0]
         disc_number = info[TRACKS][0][DISC_NUMBER]
         track_number = info[TRACKS][0][TRACK_NUMBER]
         scraped_song_id = info[TRACKS][0][ID]
         is_playable = info[TRACKS][0][IS_PLAYABLE]
         duration_ms = info[TRACKS][0][DURATION_MS]
+
+        image = info[TRACKS][0][ALBUM][IMAGES][0]
+        for i in info[TRACKS][0][ALBUM][IMAGES]:
+            if i[WIDTH] > image[WIDTH]:
+                image = i
+        image_url = image[URL]
 
         return artists, info[TRACKS][0][ARTISTS], album_name, name, image_url, release_year, disc_number, track_number, scraped_song_id, is_playable, duration_ms
     except Exception as e:

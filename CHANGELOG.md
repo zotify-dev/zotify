@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.10
+- Fix cover art size once and for all
+
 ## 0.6.9
 - Fix low resolution cover art
 - Fix crash when missing ffmpeg
