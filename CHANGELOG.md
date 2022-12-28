@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.11
+- Add new scope for reading followed artists
+- Print API errors by default
+
 ## 0.6.10
 - Fix cover art size once and for all
 

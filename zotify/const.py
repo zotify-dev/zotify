@@ -84,6 +84,8 @@ WIDTH = 'width'
 
 USER_READ_EMAIL = 'user-read-email'
 
+USER_FOLLOW_READ = 'user-follow-read'
+
 PLAYLIST_READ_PRIVATE = 'playlist-read-private'
 
 USER_LIBRARY_READ = 'user-library-read'

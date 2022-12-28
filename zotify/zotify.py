@@ -8,7 +8,7 @@ from librespot.core import Session
 
 from zotify.const import TYPE, \
     PREMIUM, USER_READ_EMAIL, OFFSET, LIMIT, \
-    PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ
+    PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ, USER_FOLLOW_READ
 from zotify.config import Config
 
 class Zotify:    
@@ -54,7 +54,9 @@ class Zotify:
 
     @classmethod
     def __get_auth_token(cls):
-        return cls.SESSION.tokens().get_token(USER_READ_EMAIL, PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ).access_token
+        return cls.SESSION.tokens().get_token(
+            USER_READ_EMAIL, PLAYLIST_READ_PRIVATE, USER_LIBRARY_READ, USER_FOLLOW_READ
+        ).access_token
 
     @classmethod
     def get_auth_header(cls):
