@@ -6,7 +6,7 @@
   <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
 </p>
 
-### Featues
+### Features
   - Downloads at up to 320kbps*
   - Downloads directly from the source**
   - Downloads podcasts, playlists, liked songs, albums, artists, singles.
