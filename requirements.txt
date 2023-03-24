@@ -1,0 +1,7 @@
+librespot@https://github.com/kokarare1212/librespot-python/archive/refs/heads/main.zip
+music-tag
+mutagen
+Pillow
+pwinput
+requests
+tqdm
