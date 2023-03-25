@@ -18,6 +18,7 @@ from zotify import Session
 from zotify.config import Config
 from zotify.file import TranscodingError
 from zotify.loader import Loader
+from zotify.playable import Track
 from zotify.printer import Printer, PrintChannel
 from zotify.utils import API_URL, AudioFormat, b62_to_hex
 
@@ -302,7 +303,7 @@ class App:
                 output,
                 self.__config.chunk_size,
             )
-            if self.__config.save_lyrics:
+            if self.__config.save_lyrics and isinstance(track, Track):
                 with Loader("Fetching lyrics..."):
                     try:
                         track.get_lyrics().save(output)

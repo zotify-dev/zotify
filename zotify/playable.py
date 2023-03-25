@@ -174,11 +174,7 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
         }
 
     def get_lyrics(self) -> Lyrics:
-        """
-        Fetch lyrics from track if available
-        Returns:
-            Instance of track lyrics
-        """
+        """Returns track lyrics if available"""
         if not self.track.has_lyrics:
             raise FileNotFoundError(
                 f"No lyrics available for {self.track.artist[0].name} - {self.track.name}"
@@ -226,10 +222,33 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
 
     def can_download_direct(self) -> bool:
         """Returns true if episode can be downloaded from its original external source"""
-        return bool(self.episode.is_externally_hosted)
+        return bool(self.external_url)
 
-    def download_direct(self) -> LocalFile:
-        """Downloads episode from original source"""
-        if not self.can_download_directly():
-            raise RuntimeError("Podcast cannot be downloaded direct")
-        raise NotImplementedError()
+    def write_audio_stream(
+        self, output: Path, chunk_size: int = 128 * 1024
+    ) -> LocalFile:
+        """
+        Writes audio stream to file
+        Args:
+            output: File path of saved audio stream
+            chunk_size: maximum number of bytes to read at a time
+        Returns:
+            LocalFile object
+        """
+        if not self.can_download_direct():
+            return super().write_audio_stream(output, chunk_size)
+        file = f"{output}.{self.external_url.rsplit('.', 1)[-1]}"
+        with get(self.external_url, stream=True) as r, open(
+            file, "wb"
+        ) as f, Printer.progress(
+            desc=self.name,
+            total=self.input_stream.size,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            position=0,
+            leave=False,
+        ) as p_bar:
+            for chunk in r.iter_content(chunk_size=chunk_size):
+                p_bar.update(f.write(chunk))
+        return LocalFile(Path(file))
