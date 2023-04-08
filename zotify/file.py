@@ -6,7 +6,7 @@ from typing import Any
 from music_tag import load_file
 from mutagen.oggvorbis import OggVorbisHeaderError
 
-from zotify.utils import AudioFormat, ExtMap
+from zotify.utils import AudioFormat
 
 
 # fmt: off
@@ -18,18 +18,16 @@ class FFmpegExecutionError(OSError, TranscodingError): ...
 
 
 class LocalFile:
-    audio_format: AudioFormat
-
     def __init__(
         self,
         path: Path,
         audio_format: AudioFormat | None = None,
         bitrate: int | None = None,
     ):
-        self.path = path
-        self.bitrate = bitrate
+        self.__path = path
+        self.__bitrate = bitrate
         if audio_format:
-            self.audio_format = audio_format
+            self.__audio_format = audio_format
 
     def transcode(
         self,
@@ -48,10 +46,10 @@ class LocalFile:
             ffmpeg: Location of FFmpeg binary
             opt_args: Additional arguments to pass to ffmpeg
         """
-        if audio_format:
-            new_ext = ExtMap[audio_format.value]
+        if audio_format is not None:
+            new_ext = audio_format.value.ext
         else:
-            new_ext = ExtMap[self.audio_format.value]
+            new_ext = self.__audio_format.value.ext
         cmd = [
             ffmpeg,
             "-y",
@@ -59,18 +57,18 @@ class LocalFile:
             "-loglevel",
             "error",
             "-i",
-            str(self.path),
+            str(self.__path),
         ]
-        newpath = self.path.parent.joinpath(
-            self.path.name.rsplit(".", 1)[0] + new_ext.value
+        newpath = self.__path.parent.joinpath(
+            self.__path.name.rsplit(".", 1)[0] + new_ext
         )
-        if self.path == newpath:
+        if self.__path == newpath:
             raise TargetExistsError(
-                f"Transcoding Error: Cannot overwrite source, target file is already a {self.audio_format} file."
+                f"Transcoding Error: Cannot overwrite source, target file is already a {self.__audio_format} file."
             )
 
         cmd.extend(["-b:a", str(bitrate) + "k"]) if bitrate else None
-        cmd.extend(["-c:a", audio_format.value]) if audio_format else None
+        cmd.extend(["-c:a", audio_format.value.name]) if audio_format else None
         cmd.extend(opt_args)
         cmd.append(str(newpath))
 
@@ -88,11 +86,11 @@ class LocalFile:
             )
 
         if replace:
-            Path(self.path).unlink()
-        self.path = newpath
-        self.bitrate = bitrate
+            self.__path.unlink()
+        self.__path = newpath
+        self.__bitrate = bitrate
         if audio_format:
-            self.audio_format = audio_format
+            self.__audio_format = audio_format
 
     def write_metadata(self, metadata: dict[str, Any]) -> None:
         """
@@ -100,7 +98,7 @@ class LocalFile:
         Args:
             metadata: key-value metadata dictionary
         """
-        f = load_file(self.path)
+        f = load_file(self.__path)
         f.save()
         for k, v in metadata.items():
             try:
@@ -118,7 +116,7 @@ class LocalFile:
         Args:
             image: raw image data
         """
-        f = load_file(self.path)
+        f = load_file(self.__path)
         f["artwork"] = image
         try:
             f.save()

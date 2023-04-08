@@ -170,7 +170,7 @@ class App:
                 self.__playable_list.append(
                     PlayableData(
                         PlayableType.TRACK,
-                        bytes_to_hex(track.gid),
+                        TrackId.from_hex(bytes_to_hex(track.gid)),
                         self.__config.music_library,
                         self.__config.output_album,
                     )
@@ -187,7 +187,7 @@ class App:
                     self.__playable_list.append(
                         PlayableData(
                             PlayableType.TRACK,
-                            bytes_to_hex(track.gid),
+                            TrackId.from_hex(bytes_to_hex(track.gid)),
                             self.__config.music_library,
                             self.__config.output_album,
                         )
@@ -215,7 +215,7 @@ class App:
             self.__playable_list.append(
                 PlayableData(
                     PlayableType.EPISODE,
-                    bytes_to_hex(episode.gid),
+                    EpisodeId.from_hex(bytes_to_hex(episode.gid)),
                     self.__config.podcast_library,
                     self.__config.output_podcast,
                 )

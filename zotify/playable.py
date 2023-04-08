@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any
 
 from librespot.core import PlayableContentFeeder
-from librespot.metadata import AlbumId
 from librespot.util import bytes_to_hex
 from librespot.structure import GeneralAudioStream
 from requests import get
@@ -132,12 +131,6 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             track.metrics,
         )
         self.__api = api
-        try:
-            isinstance(self.track.album.genre, str)
-        except AttributeError:
-            self.album = self.__api.get_metadata_4_album(
-                AlbumId.from_hex(bytes_to_hex(self.track.album.gid))
-            )
         self.cover_images = self.album.cover_group.image
         self.metadata = self.__default_metadata()
 
@@ -155,22 +148,19 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             "artist": self.artist[0].name,
             "artists": "\0".join([a.name for a in self.artist]),
             "date": f"{date.year}-{date.month}-{date.day}",
-            "release_date": f"{date.year}-{date.month}-{date.day}",
             "disc_number": self.disc_number,
             "duration": self.duration,
             "explicit": self.explicit,
-            "genre": self.album.genre,
+            "explicit_symbol": "[E]" if self.explicit else "",
             "isrc": self.external_id[0].id,
-            "licensor": self.licensor,
-            "popularity": self.popularity,
-            "track_number": self.number,
+            "popularity": (self.popularity * 255) / 100,
+            "track_number": str(self.number).zfill(2),
+            # "year": self.album.date.year,
+            "title": self.name,
             "replaygain_track_gain": self.normalization_data.track_gain_db,
             "replaygain_track_peak": self.normalization_data.track_peak,
             "replaygain_album_gain": self.normalization_data.album_gain_db,
-            "replaygain_album_prak": self.normalization_data.album_peak,
-            "title": self.name,
-            "track_title": self.name,
-            # "year": self.album.date.year,
+            "replaygain_album_peak": self.normalization_data.album_peak,
         }
 
     def get_lyrics(self) -> Lyrics:

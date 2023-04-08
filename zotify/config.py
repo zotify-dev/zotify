@@ -138,7 +138,7 @@ CONFIG_VALUES = {
     AUDIO_FORMAT: {
         "default": "vorbis",
         "type": AudioFormat,
-        "choices": [n.value for n in AudioFormat],
+        "choices": [n.value.name for n in AudioFormat],
         "arg": "--audio-format",
         "help": "Audio format of final track output",
     },
@@ -335,7 +335,7 @@ class Config:
         elif config_type == Path:
             return Path(value).expanduser()
         elif config_type == AudioFormat:
-            return AudioFormat(value)
+            return AudioFormat[value.upper()]
         elif config_type == ImageSize.from_string:
             return ImageSize.from_string(value)
         elif config_type == Quality.from_string:

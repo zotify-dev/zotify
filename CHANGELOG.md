@@ -1,4 +1,4 @@
-# STILL IN DEVELOPMENT, SOME CHANGES AREN'T IMPLEMENTED AND SOME AREN'T FINAL!
+# STILL IN DEVELOPMENT, EVERYTHING HERE IS SUBJECT TO CHANGE!
 
 ## v1.0.0
 An unexpected reboot
@@ -41,6 +41,7 @@ An unexpected reboot
     - `{album_artists}`
     - !!`{duration}` - In milliseconds
     - `{explicit}`
+    - `{explicit_symbol}` - For output format, will be \[E] if track is explicit.
     - `{isrc}`
     - `{licensor}`
     - !!`{popularity}`

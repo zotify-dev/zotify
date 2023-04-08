@@ -2,6 +2,7 @@ from argparse import Action, ArgumentError
 from enum import Enum, IntEnum
 from re import IGNORECASE, sub
 from sys import platform as PLATFORM
+from typing import NamedTuple
 
 from librespot.audio.decoders import AudioQuality
 from librespot.util import Base62, bytes_to_hex
@@ -13,26 +14,20 @@ LYRICS_URL = "https://sp" + "client.wg.sp" + "otify.com/color-lyrics/v2/track/"
 BASE62 = Base62.create_instance_with_inverted_character_set()
 
 
+class AudioCodec(NamedTuple):
+    ext: str
+    name: str
+
+
 class AudioFormat(Enum):
-    AAC = "aac"
-    FDK_AAC = "fdk_aac"
-    FLAC = "flac"
-    MP3 = "mp3"
-    OPUS = "opus"
-    VORBIS = "vorbis"
-    WAV = "wav"
-    WV = "wavpack"
-
-
-class ExtMap(Enum):
-    AAC = "m4a"
-    FDK_AAC = "m4a"
-    FLAC = "flac"
-    MP3 = "mp3"
-    OPUS = "ogg"
-    VORBIS = "ogg"
-    WAV = "wav"
-    WAVPACK = "wv"
+    AAC = AudioCodec("aac", "m4a")
+    FDK_AAC = AudioCodec("fdk_aac", "m4a")
+    FLAC = AudioCodec("flac", "flac")
+    MP3 = AudioCodec("mp3", "mp3")
+    OPUS = AudioCodec("opus", "ogg")
+    VORBIS = AudioCodec("vorbis", "ogg")
+    WAV = AudioCodec("wav", "wav")
+    WV = AudioCodec("wavpack", "wv")
 
 
 class Quality(Enum):
