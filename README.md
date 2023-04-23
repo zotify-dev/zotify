@@ -82,7 +82,16 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
 | TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
 
-*very-high is limited to premium only
+*very-high is limited to premium only  
+
+### Configuration 
+You can find the configuration file in following locations:  
+| OS              | Location          
+|-----------------|---------------------------------------------------------|
+| Windows         | `C:\Users\<USERNAME>\AppData\Roaming\Zotify\config.json`|
+| MacOS           | `/Users/<USERNAME>/.config/zotify/config.json`          |
+| Linux           | `/home/<USERNAME>/.config/zotify/config.json`           |
+
 
 ### Output format
 
