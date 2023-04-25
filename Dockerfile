@@ -4,8 +4,6 @@ RUN apk --update add ffmpeg
 
 FROM base as builder
 
-RUN apk --update add git
-
 WORKDIR /install
 COPY requirements.txt /requirements.txt
 
