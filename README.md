@@ -115,12 +115,12 @@ Bangers/{artist} - {song_name}.{ext}
 /home/user/downloads/{artist} - {song_name} [{id}].{ext}
 ~~~~
 
-### Docker Usage - CURRENTLY BROKEN
+### Docker Usage
 ```
 Build the docker image from the Dockerfile:
   docker build -t zotify .
 Create and run a container from the image:
-  docker run --rm -u $(id -u):$(id -g) -v "$PWD/zotify:/app" -v "$PWD/config.json:/config.json" -v "$PWD/Zotify Music:/Zotify Music" -v "$PWD/Zotify Podcasts:/Zotify Podcasts" -it zotify
+  docker run --rm -v "$PWD/Zotify Music:/root/Music/Zotify Music" -v "$PWD/Zotify Podcasts:/root/Music/Zotify Podcasts" -it zotify
 ```
 
 ### What do I do if I see "Your session has been terminated"?
