@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from zotify.app import client
+from zotify.app import App
 from zotify.config import CONFIG_PATHS, CONFIG_VALUES
 from zotify.utils import OptionalOrFalse
 
@@ -118,7 +118,7 @@ def main():
                     help=v["help"],
                 )
 
-    parser.set_defaults(func=client)
+    parser.set_defaults(func=App)
     args = parser.parse_args()
     if args.version:
         print(VERSION)

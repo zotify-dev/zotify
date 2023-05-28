@@ -21,7 +21,7 @@ Available on [zotify.xyz](https://zotify.xyz/zotify/zotify) and [GitHub](https:/
 *Non-premium accounts are limited to 160kbps
 
 ## Installation
-Requires Python 3.9 or greater. \
+Requires Python 3.10 or greater. \
 Optionally requires FFmpeg to save tracks as anything other than Ogg Vorbis.
 
 Enter the following command in terminal to install Zotify. \

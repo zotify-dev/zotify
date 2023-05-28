@@ -1,4 +1,4 @@
-librespot@https://github.com/kokarare1212/librespot-python/archive/refs/heads/main.zip
+librespot>=0.0.9
 music-tag
 mutagen
 Pillow

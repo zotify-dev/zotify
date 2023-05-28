@@ -210,10 +210,6 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
             "title": self.name,
         }
 
-    def can_download_direct(self) -> bool:
-        """Returns true if episode can be downloaded from its original external source"""
-        return bool(self.external_url)
-
     def write_audio_stream(
         self, output: Path, chunk_size: int = 128 * 1024
     ) -> LocalFile:
@@ -225,7 +221,7 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
         Returns:
             LocalFile object
         """
-        if not self.can_download_direct():
+        if bool(self.external_url):
             return super().write_audio_stream(output, chunk_size)
         file = f"{output}.{self.external_url.rsplit('.', 1)[-1]}"
         with get(self.external_url, stream=True) as r, open(
