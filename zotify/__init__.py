@@ -1,20 +1,16 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from librespot.audio.decoders import VorbisOnlyAudioQuality
-from librespot.core import (
-    ApiClient,
-    PlayableContentFeeder,
-    Session as LibrespotSession,
-)
+from librespot.core import ApiClient, PlayableContentFeeder
+from librespot.core import Session as LibrespotSession
 from librespot.metadata import EpisodeId, PlayableId, TrackId
 from pwinput import pwinput
 from requests import HTTPError, get
 
 from zotify.playable import Episode, Track
-from zotify.utils import (
-    API_URL,
-    Quality,
-)
+from zotify.utils import API_URL, Quality
 
 
 class Api(ApiClient):
@@ -40,8 +36,8 @@ class Api(ApiClient):
         self,
         url: str,
         params: dict = {},
-        limit: int | None = None,
-        offset: int | None = None,
+        limit: int = 20,
+        offset: int = 0,
     ) -> dict:
         """
         Requests data from api
@@ -59,10 +55,8 @@ class Api(ApiClient):
             "Accept-Language": self.__language,
             "app-platform": "WebPlayer",
         }
-        if limit:
-            params["limit"] = limit
-        if offset:
-            params["offset"] = offset
+        params["limit"] = limit
+        params["offset"] = offset
 
         response = get(url, headers=headers, params=params)
         data = response.json()
@@ -78,61 +72,82 @@ class Api(ApiClient):
 class Session:
     __api: Api
     __country: str
-    __is_premium: bool
+    __language: str
     __session: LibrespotSession
+    __session_builder: LibrespotSession.Builder
 
     def __init__(
         self,
-        cred_file: Path | None = None,
-        username: str | None = None,
-        password: str | None = None,
-        save: bool | None = False,
+        session_builder: LibrespotSession.Builder,
         language: str = "en",
     ) -> None:
         """
-        Authenticates user, saves credentials to a file
-        and generates api token
+        Authenticates user, saves credentials to a file and generates api token.
         Args:
-            cred_file: Path to the credentials file
+            session_builder: An instance of the Librespot Session.Builder
+            langauge: ISO 639-1 language code
+        """
+        self.__session_builder = session_builder
+        self.__session = self.__session_builder.create()
+        self.__language = language
+        self.__api = Api(self.__session, language)
+
+    @staticmethod
+    def from_file(cred_file: Path, langauge: str = "en") -> Session:
+        """
+        Creates session using saved credentials file
+        Args:
+            cred_file: Path to credentials file
+            langauge: ISO 639-1 language code
+        Returns:
+            Zotify session
+        """
+        conf = (
+            LibrespotSession.Configuration.Builder()
+            .set_store_credentials(False)
+            .build()
+        )
+        return Session(
+            LibrespotSession.Builder(conf).stored_file(str(cred_file)), langauge
+        )
+
+    @staticmethod
+    def from_userpass(
+        username: str = "",
+        password: str = "",
+        save_file: Path | None = None,
+        language: str = "en",
+    ) -> Session:
+        """
+        Creates session using username & password
+        Args:
             username: Account username
             password: Account password
-            save: Save given credentials to a file
+            save_file: Path to save login credentials to, optional.
+            langauge: ISO 639-1 language code
+        Returns:
+            Zotify session
         """
-        # Find an existing credentials file
-        if cred_file is not None and cred_file.is_file():
+        username = input("Username: ") if username == "" else username
+        password = (
+            pwinput(prompt="Password: ", mask="*") if password == "" else password
+        )
+        if save_file:
+            save_file.parent.mkdir(parents=True, exist_ok=True)
+            conf = (
+                LibrespotSession.Configuration.Builder()
+                .set_stored_credential_file(str(save_file))
+                .build()
+            )
+        else:
             conf = (
                 LibrespotSession.Configuration.Builder()
                 .set_store_credentials(False)
                 .build()
             )
-            self.__session = (
-                LibrespotSession.Builder(conf).stored_file(str(cred_file)).create()
-            )
-        # Otherwise get new credentials
-        else:
-            username = input("Username: ") if username is None else username
-            password = (
-                pwinput(prompt="Password: ", mask="*") if password is None else password
-            )
-
-            # Save credentials to file
-            if save and cred_file:
-                cred_file.parent.mkdir(parents=True, exist_ok=True)
-                conf = (
-                    LibrespotSession.Configuration.Builder()
-                    .set_stored_credential_file(str(cred_file))
-                    .build()
-                )
-            else:
-                conf = (
-                    LibrespotSession.Configuration.Builder()
-                    .set_store_credentials(False)
-                    .build()
-                )
-            self.__session = (
-                LibrespotSession.Builder(conf).user_pass(username, password).create()
-            )
-        self.__api = Api(self.__session, language)
+        return Session(
+            LibrespotSession.Builder(conf).user_pass(username, password), language
+        )
 
     def __get_playable(
         self, playable_id: PlayableId, quality: Quality
@@ -182,3 +197,7 @@ class Session:
     def is_premium(self) -> bool:
         """Returns users premium account status"""
         return self.__session.get_user_attribute("type") == "premium"
+
+    def clone(self) -> Session:
+        """Creates a copy of the session for use in a parallel thread"""
+        return Session(session_builder=self.__session_builder, language=self.__language)

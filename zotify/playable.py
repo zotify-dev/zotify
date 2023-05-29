@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Any
 
 from librespot.core import PlayableContentFeeder
-from librespot.util import bytes_to_hex
 from librespot.structure import GeneralAudioStream
+from librespot.util import bytes_to_hex
 from requests import get
 
 from zotify.file import LocalFile
@@ -69,7 +69,7 @@ class Playable:
         """
         for k, v in self.metadata.items():
             output = output.replace(
-                "{" + k + "}", fix_filename(str(v).replace("\0", ","))
+                "{" + k + "}", fix_filename(str(v).replace("\0", ", "))
             )
         file_path = library.joinpath(output).expanduser()
         if file_path.exists() and not replace:

@@ -7,7 +7,7 @@ from zotify.app import App
 from zotify.config import CONFIG_PATHS, CONFIG_VALUES
 from zotify.utils import OptionalOrFalse
 
-VERSION = "0.9.1"
+VERSION = "0.9.2"
 
 
 def main():
@@ -22,6 +22,11 @@ def main():
         help="Print version and exit",
     )
     parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Don't hide tracebacks",
+    )
+    parser.add_argument(
         "--config",
         type=Path,
         default=CONFIG_PATHS["conf"],
@@ -31,7 +36,7 @@ def main():
         "-l",
         "--library",
         type=Path,
-        help="Specify a path to the root of a music/podcast library",
+        help="Specify a path to the root of a music/playlist/podcast library",
     )
     parser.add_argument(
         "-o", "--output", type=str, help="Specify the output location/format"
@@ -45,8 +50,8 @@ def main():
         nargs="+",
         help="Searches for only this type",
     )
-    parser.add_argument("--username", type=str, help="Account username")
-    parser.add_argument("--password", type=str, help="Account password")
+    parser.add_argument("--username", type=str, default="", help="Account username")
+    parser.add_argument("--password", type=str, default="", help="Account password")
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
         "urls",
@@ -123,12 +128,15 @@ def main():
     if args.version:
         print(VERSION)
         return
-    args.func(args)
-    return
-    try:
+    if args.debug:
         args.func(args)
-    except Exception as e:
-        print(f"Fatal Error: {e}")
+    else:
+        try:
+            args.func(args)
+        except Exception:
+            from traceback import format_exc
+
+            print(format_exc().splitlines()[-1])
 
 
 if __name__ == "__main__":

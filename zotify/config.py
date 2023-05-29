@@ -6,7 +6,6 @@ from typing import Any
 
 from zotify.utils import AudioFormat, ImageSize, Quality
 
-
 ALL_ARTISTS = "all_artists"
 ARTWORK_SIZE = "artwork_size"
 AUDIO_FORMAT = "audio_format"
@@ -60,9 +59,9 @@ CONFIG_PATHS = {
 }
 
 OUTPUT_PATHS = {
-    "album": "{album_artist}/{album}/{track_number}. {artist} - {title}",
+    "album": "{album_artist}/{album}/{track_number}. {artists} - {title}",
     "podcast": "{podcast}/{episode_number} - {title}",
-    "playlist_track": "{playlist}/{playlist_number}. {artist} - {title}",
+    "playlist_track": "{playlist}/{playlist_number}. {artists} - {title}",
     "playlist_episode": "{playlist}/{playlist_number}. {episode_number} - {title}",
 }
 
@@ -170,7 +169,7 @@ CONFIG_VALUES = {
         "default": "en",
         "type": str,
         "arg": "--language",
-        "help": "Language for metadata"
+        "help": "Language for metadata",
     },
     SAVE_LYRICS: {
         "default": True,
@@ -239,7 +238,7 @@ CONFIG_VALUES = {
         "help": "Show progress bars",
     },
     PRINT_SKIPS: {
-        "default": True,
+        "default": False,
         "type": bool,
         "arg": "--print-skips",
         "help": "Show messages if a song is being skipped",

@@ -1,14 +1,15 @@
 from enum import Enum
 from sys import stderr
+
 from tqdm import tqdm
 
 from zotify.config import (
-    Config,
-    PRINT_SKIPS,
-    PRINT_PROGRESS,
-    PRINT_ERRORS,
-    PRINT_WARNINGS,
     PRINT_DOWNLOADS,
+    PRINT_ERRORS,
+    PRINT_PROGRESS,
+    PRINT_SKIPS,
+    PRINT_WARNINGS,
+    Config,
 )
 
 

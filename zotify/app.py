@@ -18,8 +18,7 @@ from zotify import Session
 from zotify.config import Config
 from zotify.file import TranscodingError
 from zotify.loader import Loader
-from zotify.playable import Track
-from zotify.printer import Printer, PrintChannel
+from zotify.printer import PrintChannel, Printer
 from zotify.utils import API_URL, AudioFormat, b62_to_hex
 
 
@@ -174,39 +173,46 @@ class App:
     __session: Session
     __playable_list: list[PlayableData] = []
 
-    def __init__(
-        self,
-        args: Namespace,
-    ):
+    def __init__(self, args: Namespace):
         self.__config = Config(args)
         Printer(self.__config)
 
-        if self.__config.audio_format == AudioFormat.VORBIS and (self.__config.ffmpeg_args != "" or self.__config.ffmpeg_path != ""):
-            Printer.print(PrintChannel.WARNINGS, "FFmpeg options will be ignored since no transcoding is required")
+        if self.__config.audio_format == AudioFormat.VORBIS and (
+            self.__config.ffmpeg_args != "" or self.__config.ffmpeg_path != ""
+        ):
+            Printer.print(
+                PrintChannel.WARNINGS,
+                "FFmpeg options will be ignored since no transcoding is required",
+            )
 
         with Loader("Logging in..."):
-            if self.__config.credentials is False:
-                self.__session = Session()
+            if (
+                args.username != "" and args.password != ""
+            ) or not self.__config.credentials.is_file():
+                self.__session = Session.from_userpass(
+                    args.username,
+                    args.password,
+                    self.__config.credentials,
+                    self.__config.language,
+                )
             else:
-                self.__session = Session(
-                    cred_file=self.__config.credentials,
-                    save=True,
-                    language=self.__config.language,
+                self.__session = Session.from_file(
+                    self.__config.credentials, self.__config.language
                 )
 
         ids = self.get_selection(args)
         with Loader("Parsing input..."):
             try:
                 self.parse(ids)
-            except (IndexError, TypeError) as e:
+            except ParsingError as e:
                 Printer.print(PrintChannel.ERRORS, str(e))
-        self.download()
+        self.download_all()
 
     def get_selection(self, args: Namespace) -> list[str]:
         selection = Selection(self.__session)
         try:
             if args.search:
-                return selection.search(args.search, args.category)
+                return selection.search(" ".join(args.search), args.category)
             elif args.playlist:
                 return selection.get("playlists", "items")
             elif args.followed:
@@ -222,7 +228,7 @@ class App:
                 return ids
             elif args.urls:
                 return args.urls
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, KeyboardInterrupt):
             pass
         Printer.print(PrintChannel.WARNINGS, "there is nothing to do")
         exit()
@@ -340,63 +346,56 @@ class App:
         """Returns list of Playable items"""
         return self.__playable_list
 
-    def download(self) -> None:
+    def download_all(self) -> None:
         """Downloads playable to local file"""
         for playable in self.__playable_list:
-            if playable.type == PlayableType.TRACK:
-                with Loader("Fetching track..."):
-                    track = self.__session.get_track(
-                        playable.id, self.__config.download_quality
-                    )
-            elif playable.type == PlayableType.EPISODE:
-                with Loader("Fetching episode..."):
-                    track = self.__session.get_episode(playable.id)
-            else:
-                Printer.print(
-                    PrintChannel.SKIPS,
-                    f'Download Error: Unknown playable content "{playable.type}"',
+            self.__download(playable)
+
+    def __download(self, playable: PlayableData) -> None:
+        if playable.type == PlayableType.TRACK:
+            with Loader("Fetching track..."):
+                track = self.__session.get_track(
+                    playable.id, self.__config.download_quality
                 )
-                continue
-
-            try:
-                output = track.create_output(playable.library, playable.output)
-            except FileExistsError as e:
-                Printer.print(PrintChannel.SKIPS, str(e))
-                continue
-
-            file = track.write_audio_stream(
-                output,
-                self.__config.chunk_size,
+        elif playable.type == PlayableType.EPISODE:
+            with Loader("Fetching episode..."):
+                track = self.__session.get_episode(playable.id)
+        else:
+            Printer.print(
+                PrintChannel.SKIPS,
+                f'Download Error: Unknown playable content "{playable.type}"',
             )
-            if self.__config.save_lyrics and isinstance(track, Track):
-                with Loader("Fetching lyrics..."):
-                    try:
-                        track.get_lyrics().save(output)
-                    except FileNotFoundError as e:
-                        Printer.print(PrintChannel.SKIPS, str(e))
+            return
 
-            Printer.print(PrintChannel.DOWNLOADS, f"\nDownloaded {track.name}")
+        output = track.create_output(playable.library, playable.output)
+        file = track.write_audio_stream(
+            output,
+            self.__config.chunk_size,
+        )
 
-            if self.__config.audio_format != AudioFormat.VORBIS:
+        if self.__config.save_lyrics and playable.type == PlayableType.TRACK:
+            with Loader("Fetching lyrics..."):
                 try:
-                    with Loader(PrintChannel.PROGRESS, "Converting audio..."):
-                        file.transcode(
-                            self.__config.audio_format,
-                            self.__config.transcode_bitrate
-                            if self.__config.transcode_bitrate > 0
-                            else None,
-                            True,
-                            self.__config.ffmpeg_path
-                            if self.__config.ffmpeg_path != ""
-                            else "ffmpeg",
-                            self.__config.ffmpeg_args.split(),
-                        )
-                except TranscodingError as e:
-                    Printer.print(PrintChannel.ERRORS, str(e))
+                    track.get_lyrics().save(output)
+                except FileNotFoundError as e:
+                    Printer.print(PrintChannel.SKIPS, str(e))
 
-            if self.__config.save_metadata:
-                with Loader("Writing metadata..."):
-                    file.write_metadata(track.metadata)
-                    file.write_cover_art(
-                        track.get_cover_art(self.__config.artwork_size)
+        Printer.print(PrintChannel.DOWNLOADS, f"\nDownloaded {track.name}")
+
+        if self.__config.audio_format != AudioFormat.VORBIS:
+            try:
+                with Loader(PrintChannel.PROGRESS, "Converting audio..."):
+                    file.transcode(
+                        self.__config.audio_format,
+                        self.__config.transcode_bitrate,
+                        True,
+                        self.__config.ffmpeg_path,
+                        self.__config.ffmpeg_args.split(),
                     )
+            except TranscodingError as e:
+                Printer.print(PrintChannel.ERRORS, str(e))
+
+        if self.__config.save_metadata:
+            with Loader("Writing metadata..."):
+                file.write_metadata(track.metadata)
+                file.write_cover_art(track.get_cover_art(self.__config.artwork_size))
