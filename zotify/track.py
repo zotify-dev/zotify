@@ -256,7 +256,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
                     if(Zotify.CONFIG.get_download_lyrics()):
                         try:
-                            get_song_lyrics(track_id, PurePath(str(filename).replace(ext, 'lrc')))
+                            get_song_lyrics(track_id, PurePath(str(filename)[:-3] + "lrc"))
                         except ValueError:
                             Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
                     convert_audio_format(filename_temp)
