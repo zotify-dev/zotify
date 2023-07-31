@@ -137,6 +137,8 @@ def main():
             from traceback import format_exc
 
             print(format_exc().splitlines()[-1])
+        except KeyboardInterrupt:
+            print("goodbye")
 
 
 if __name__ == "__main__":

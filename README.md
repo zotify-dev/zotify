@@ -93,7 +93,7 @@ Here's a very simple example of downloading a track and its metadata:
 ```python
 import zotify
 
-session = zotify.Session(username="username", password="password")
+session = zotify.Session.from_userpass(username="username", password="password")
 track = session.get_track("4cOdK2wGLETKBW3PvgPWqT")
 output = track.create_output("./Music", "{artist} - {title}")
 

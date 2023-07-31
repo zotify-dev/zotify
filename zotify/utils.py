@@ -2,7 +2,7 @@ from argparse import Action, ArgumentError
 from enum import Enum, IntEnum
 from re import IGNORECASE, sub
 from sys import platform as PLATFORM
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from librespot.audio.decoders import AudioQuality
 from librespot.util import Base62, bytes_to_hex
@@ -110,6 +110,29 @@ class OptionalOrFalse(Action):
             self.dest,
             values if not option_string.startswith("--no-") else False,
         )
+
+
+class MetadataEntry:
+    def __init__(self, name: str, value: Any, output_value: str | None = None):
+        """
+        Holds metadata entries
+        args:
+            name: name of metadata key
+            tag_val: Value to use in metadata tags
+            output_value: Value when used in output formatting
+        """
+        self.name = name
+        if type(value) == list:
+            value = "\0".join(value)
+        self.value = value
+
+        if output_value is None:
+            output_value = value
+        if output_value == "":
+            output_value = None
+        if type(output_value) == list:
+            output_value = ", ".join(output_value)
+        self.output = str(output_value)
 
 
 def fix_filename(filename: str, substitute: str = "_", platform: str = PLATFORM) -> str:

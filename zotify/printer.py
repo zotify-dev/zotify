@@ -71,11 +71,12 @@ class Printer:
             unit_divisor=unit_divisor,
         )
 
-    @staticmethod
-    def print_loader(msg: str) -> None:
+    @classmethod
+    def print_loader(cls, msg: str) -> None:
         """
         Prints animated loading symbol
         Args:
             msg: Message to print
         """
-        print(msg, flush=True, end="")
+        if cls.__config.print_progress:
+            print(msg, flush=True, end="")

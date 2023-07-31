@@ -14,6 +14,7 @@ from zotify.utils import (
     LYRICS_URL,
     AudioFormat,
     ImageSize,
+    MetadataEntry,
     bytes_to_base62,
     fix_filename,
 )
@@ -53,7 +54,7 @@ class Lyrics:
 
 class Playable:
     cover_images: list[Any]
-    metadata: dict[str, Any]
+    metadata: list[MetadataEntry]
     name: str
     input_stream: GeneralAudioStream
 
@@ -67,13 +68,12 @@ class Playable:
         Returns:
             File path for the track
         """
-        for k, v in self.metadata.items():
-            output = output.replace(
-                "{" + k + "}", fix_filename(str(v).replace("\0", ", "))
-            )
+        for m in self.metadata:
+            if m.output is not None:
+                output = output.replace("{" + m.name + "}", fix_filename(m.output))
         file_path = library.joinpath(output).expanduser()
         if file_path.exists() and not replace:
-            raise FileExistsError("Output Creation Error: File already downloaded")
+            raise FileExistsError("File already downloaded")
         else:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             return file_path
@@ -140,28 +140,34 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
         except AttributeError:
             return super().__getattribute__("track").__getattribute__(name)
 
-    def __default_metadata(self) -> dict[str, Any]:
+    def __default_metadata(self) -> list[MetadataEntry]:
         date = self.album.date
-        return {
-            "album": self.album.name,
-            "album_artist": "\0".join([a.name for a in self.album.artist]),
-            "artist": self.artist[0].name,
-            "artists": "\0".join([a.name for a in self.artist]),
-            "date": f"{date.year}-{date.month}-{date.day}",
-            "disc_number": self.disc_number,
-            "duration": self.duration,
-            "explicit": self.explicit,
-            "explicit_symbol": "[E]" if self.explicit else "",
-            "isrc": self.external_id[0].id,
-            "popularity": (self.popularity * 255) / 100,
-            "track_number": str(self.number).zfill(2),
-            # "year": self.album.date.year,
-            "title": self.name,
-            "replaygain_track_gain": self.normalization_data.track_gain_db,
-            "replaygain_track_peak": self.normalization_data.track_peak,
-            "replaygain_album_gain": self.normalization_data.album_gain_db,
-            "replaygain_album_peak": self.normalization_data.album_peak,
-        }
+        return [
+            MetadataEntry("album", self.album.name),
+            MetadataEntry("album_artist", [a.name for a in self.album.artist]),
+            MetadataEntry("artist", self.artist[0].name),
+            MetadataEntry("artists", [a.name for a in self.artist]),
+            MetadataEntry("date", f"{date.year}-{date.month}-{date.day}"),
+            MetadataEntry("disc", self.disc_number),
+            MetadataEntry("duration", self.duration),
+            MetadataEntry("explicit", self.explicit, "[E]" if self.explicit else ""),
+            MetadataEntry("isrc", self.external_id[0].id),
+            MetadataEntry("popularity", int(self.popularity * 255) / 100),
+            MetadataEntry("track_number", self.number, str(self.number).zfill(2)),
+            MetadataEntry("title", self.name),
+            MetadataEntry(
+                "replaygain_track_gain", self.normalization_data.track_gain_db, ""
+            ),
+            MetadataEntry(
+                "replaygain_track_peak", self.normalization_data.track_peak, ""
+            ),
+            MetadataEntry(
+                "replaygain_album_gain", self.normalization_data.album_gain_db, ""
+            ),
+            MetadataEntry(
+                "replaygain_album_peak", self.normalization_data.album_peak, ""
+            ),
+        ]
 
     def get_lyrics(self) -> Lyrics:
         """Returns track lyrics if available"""
@@ -198,17 +204,17 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
         except AttributeError:
             return super().__getattribute__("episode").__getattribute__(name)
 
-    def __default_metadata(self) -> dict[str, Any]:
-        return {
-            "description": self.description,
-            "duration": self.duration,
-            "episode_number": self.number,
-            "explicit": self.explicit,
-            "language": self.language,
-            "podcast": self.show.name,
-            "date": self.publish_time,
-            "title": self.name,
-        }
+    def __default_metadata(self) -> list[MetadataEntry]:
+        return [
+            MetadataEntry("description", self.description),
+            MetadataEntry("duration", self.duration),
+            MetadataEntry("episode_number", self.number),
+            MetadataEntry("explicit", self.explicit, "[E]" if self.explicit else ""),
+            MetadataEntry("language", self.language),
+            MetadataEntry("podcast", self.show.name),
+            MetadataEntry("date", self.publish_time),
+            MetadataEntry("title", self.name),
+        ]
 
     def write_audio_stream(
         self, output: Path, chunk_size: int = 128 * 1024
@@ -221,7 +227,7 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
         Returns:
             LocalFile object
         """
-        if bool(self.external_url):
+        if not bool(self.external_url):
             return super().write_audio_stream(output, chunk_size)
         file = f"{output}.{self.external_url.rsplit('.', 1)[-1]}"
         with get(self.external_url, stream=True) as r, open(

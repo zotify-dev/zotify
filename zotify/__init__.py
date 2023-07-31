@@ -70,15 +70,9 @@ class Api(ApiClient):
 
 
 class Session:
-    __api: Api
-    __country: str
-    __language: str
-    __session: LibrespotSession
-    __session_builder: LibrespotSession.Builder
-
     def __init__(
         self,
-        session_builder: LibrespotSession.Builder,
+        librespot_session: LibrespotSession,
         language: str = "en",
     ) -> None:
         """
@@ -87,10 +81,10 @@ class Session:
             session_builder: An instance of the Librespot Session.Builder
             langauge: ISO 639-1 language code
         """
-        self.__session_builder = session_builder
-        self.__session = self.__session_builder.create()
+        self.__session = librespot_session
         self.__language = language
         self.__api = Api(self.__session, language)
+        self.__country = self.api().invoke_url(API_URL + "me")["country"]
 
     @staticmethod
     def from_file(cred_file: Path, langauge: str = "en") -> Session:
@@ -98,7 +92,7 @@ class Session:
         Creates session using saved credentials file
         Args:
             cred_file: Path to credentials file
-            langauge: ISO 639-1 language code
+            langauge: ISO 639-1 language code for API responses
         Returns:
             Zotify session
         """
@@ -107,9 +101,8 @@ class Session:
             .set_store_credentials(False)
             .build()
         )
-        return Session(
-            LibrespotSession.Builder(conf).stored_file(str(cred_file)), langauge
-        )
+        session = LibrespotSession.Builder(conf).stored_file(str(cred_file))
+        return Session(session.create(), langauge)
 
     @staticmethod
     def from_userpass(
@@ -124,7 +117,7 @@ class Session:
             username: Account username
             password: Account password
             save_file: Path to save login credentials to, optional.
-            langauge: ISO 639-1 language code
+            langauge: ISO 639-1 language code for API responses
         Returns:
             Zotify session
         """
@@ -132,22 +125,18 @@ class Session:
         password = (
             pwinput(prompt="Password: ", mask="*") if password == "" else password
         )
+
+        builder = LibrespotSession.Configuration.Builder()
         if save_file:
             save_file.parent.mkdir(parents=True, exist_ok=True)
-            conf = (
-                LibrespotSession.Configuration.Builder()
-                .set_stored_credential_file(str(save_file))
-                .build()
-            )
+            builder.set_stored_credential_file(str(save_file))
         else:
-            conf = (
-                LibrespotSession.Configuration.Builder()
-                .set_store_credentials(False)
-                .build()
-            )
-        return Session(
-            LibrespotSession.Builder(conf).user_pass(username, password), language
+            builder.set_store_credentials(False)
+
+        session = LibrespotSession.Builder(builder.build()).user_pass(
+            username, password
         )
+        return Session(session.create(), language)
 
     def __get_playable(
         self, playable_id: PlayableId, quality: Quality
@@ -188,11 +177,7 @@ class Session:
 
     def country(self) -> str:
         """Returns two letter country code of user's account"""
-        try:
-            return self.__country
-        except AttributeError:
-            self.__country = self.api().invoke_url(API_URL + "me")["country"]
-            return self.__country
+        return self.__country
 
     def is_premium(self) -> bool:
         """Returns users premium account status"""
@@ -200,4 +185,4 @@ class Session:
 
     def clone(self) -> Session:
         """Creates a copy of the session for use in a parallel thread"""
-        return Session(session_builder=self.__session_builder, language=self.__language)
+        return Session(self.__session, self.__language)

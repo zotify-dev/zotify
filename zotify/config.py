@@ -1,5 +1,6 @@
 from argparse import Namespace
 from json import dump, load
+from os import environ
 from pathlib import Path
 from sys import platform as PLATFORM
 from typing import Any
@@ -33,7 +34,7 @@ PRINT_PROGRESS = "print_progress"
 PRINT_SKIPS = "print_skips"
 PRINT_WARNINGS = "print_warnings"
 REPLACE_EXISTING = "replace_existing"
-SAVE_LYRICS = "save_lyrics"
+SAVE_LYRICS_FILE = "save_lyrics_file"
 SAVE_METADATA = "save_metadata"
 SAVE_SUBTITLES = "save_subtitles"
 SKIP_DUPLICATES = "skip_duplicates"
@@ -42,8 +43,10 @@ TRANSCODE_BITRATE = "transcode_bitrate"
 
 SYSTEM_PATHS = {
     "win32": Path.home().joinpath("AppData/Roaming/Zotify"),
-    "linux": Path.home().joinpath(".config/zotify"),
     "darwin": Path.home().joinpath("Library/Application Support/Zotify"),
+    "linux": Path(environ.get("XDG_CONFIG_HOME") or "~/.config")
+    .expanduser()
+    .joinpath("zotify"),
 }
 
 LIBRARY_PATHS = {
@@ -171,10 +174,10 @@ CONFIG_VALUES = {
         "arg": "--language",
         "help": "Language for metadata",
     },
-    SAVE_LYRICS: {
+    SAVE_LYRICS_FILE: {
         "default": True,
         "type": bool,
-        "arg": "--save-lyrics",
+        "arg": "--save-lyrics-file",
         "help": "Save lyrics to a file",
     },
     LYRICS_ONLY: {
@@ -277,7 +280,7 @@ class Config:
     playlist_library: Path
     podcast_library: Path
     print_progress: bool
-    save_lyrics: bool
+    save_lyrics_file: bool
     save_metadata: bool
     transcode_bitrate: int
 

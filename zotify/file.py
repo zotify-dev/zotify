@@ -1,12 +1,11 @@
 from errno import ENOENT
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any
 
 from music_tag import load_file
 from mutagen.oggvorbis import OggVorbisHeaderError
 
-from zotify.utils import AudioFormat
+from zotify.utils import AudioFormat, MetadataEntry
 
 
 class TranscodingError(RuntimeError):
@@ -87,7 +86,7 @@ class LocalFile:
         self.__audio_format = audio_format
         self.__bitrate = bitrate
 
-    def write_metadata(self, metadata: dict[str, Any]) -> None:
+    def write_metadata(self, metadata: list[MetadataEntry]) -> None:
         """
         Write metadata to file
         Args:
@@ -95,9 +94,9 @@ class LocalFile:
         """
         f = load_file(self.__path)
         f.save()
-        for k, v in metadata.items():
+        for m in metadata:
             try:
-                f[k] = str(v)
+                f[m.name] = m.value
             except KeyError:
                 pass
         try:

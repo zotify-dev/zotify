@@ -1,5 +1,5 @@
 librespot>=0.0.9
-music-tag
+music-tag@git+https://zotify.xyz/zotify/music-tag
 mutagen
 Pillow
 pwinput

@@ -22,7 +22,7 @@ from zotify.printer import PrintChannel, Printer
 from zotify.utils import API_URL, AudioFormat, b62_to_hex
 
 
-class ParsingError(RuntimeError):
+class ParseError(ValueError):
     ...
 
 
@@ -36,6 +36,7 @@ class PlayableData(NamedTuple):
     id: PlayableId
     library: Path
     output: str
+    metadata: dict[str, Any] = {}
 
 
 class Selection:
@@ -55,17 +56,18 @@ class Selection:
         ],
     ) -> list[str]:
         categories = ",".join(category)
-        resp = self.__session.api().invoke_url(
-            API_URL + "search",
-            {
-                "q": search_text,
-                "type": categories,
-                "include_external": "audio",
-                "market": self.__session.country(),
-            },
-            limit=10,
-            offset=0,
-        )
+        with Loader("Searching..."):
+            resp = self.__session.api().invoke_url(
+                API_URL + "search",
+                {
+                    "q": search_text,
+                    "type": categories,
+                    "include_external": "audio",
+                    "market": self.__session.country(),
+                },
+                limit=10,
+                offset=0,
+            )
 
         count = 0
         links = []
@@ -79,11 +81,22 @@ class Selection:
                     count += 1
         return self.__get_selection(links)
 
-    def get(self, item: str, suffix: str) -> list[str]:
-        resp = self.__session.api().invoke_url(f"{API_URL}me/{item}", limit=50)[suffix]
+    def get(self, category: str, name: str = "", content: str = "") -> list[str]:
+        with Loader("Fetching items..."):
+            r = self.__session.api().invoke_url(f"{API_URL}me/{category}", limit=50)
+            if content != "":
+                r = r[content]
+            resp = r["items"]
+
+        items = []
         for i in range(len(resp)):
-            self.__print(i + 1, resp[i])
-        return self.__get_selection(resp)
+            try:
+                item = resp[i][name]
+            except KeyError:
+                item = resp[i]
+            items.append(item)
+            self.__print(i + 1, item)
+        return self.__get_selection(items)
 
     @staticmethod
     def from_file(file_path: Path) -> list[str]:
@@ -169,8 +182,6 @@ class Selection:
 
 
 class App:
-    __config: Config
-    __session: Session
     __playable_list: list[PlayableData] = []
 
     def __init__(self, args: Namespace):
@@ -204,7 +215,7 @@ class App:
         with Loader("Parsing input..."):
             try:
                 self.parse(ids)
-            except ParsingError as e:
+            except ParseError as e:
                 Printer.print(PrintChannel.ERRORS, str(e))
         self.download_all()
 
@@ -214,13 +225,13 @@ class App:
             if args.search:
                 return selection.search(" ".join(args.search), args.category)
             elif args.playlist:
-                return selection.get("playlists", "items")
+                return selection.get("playlists")
             elif args.followed:
-                return selection.get("following?type=artist", "artists")
+                return selection.get("following?type=artist", content="artists")
             elif args.liked_tracks:
-                return selection.get("tracks", "items")
+                return selection.get("tracks", "track")
             elif args.liked_episodes:
-                return selection.get("episodes", "items")
+                return selection.get("episodes")
             elif args.download:
                 ids = []
                 for x in args.download:
@@ -228,9 +239,10 @@ class App:
                 return ids
             elif args.urls:
                 return args.urls
-        except (FileNotFoundError, ValueError, KeyboardInterrupt):
-            pass
-        Printer.print(PrintChannel.WARNINGS, "there is nothing to do")
+        except (FileNotFoundError, ValueError):
+            Printer.print(PrintChannel.WARNINGS, "there is nothing to do")
+        except KeyboardInterrupt:
+            Printer.print(PrintChannel.WARNINGS, "\nthere is nothing to do")
         exit()
 
     def parse(self, links: list[str]) -> None:
@@ -246,7 +258,7 @@ class App:
                 _id = split[-1]
                 id_type = split[-2]
             except IndexError:
-                raise ParsingError(f'Could not parse "{link}"')
+                raise ParseError(f'Could not parse "{link}"')
 
             match id_type:
                 case "album":
@@ -262,7 +274,7 @@ class App:
                 case "playlist":
                     self.__parse_playlist(_id)
                 case _:
-                    raise ParsingError(f'Unknown content type "{id_type}"')
+                    raise ParseError(f'Unknown content type "{id_type}"')
 
     def __parse_album(self, hex_id: str) -> None:
         album = self.__session.api().get_metadata_4_album(AlbumId.from_hex(hex_id))
@@ -279,9 +291,9 @@ class App:
 
     def __parse_artist(self, hex_id: str) -> None:
         artist = self.__session.api().get_metadata_4_artist(ArtistId.from_hex(hex_id))
-        for album in artist.album_group + artist.single_group:
+        for album_group in artist.album_group and artist.single_group:
             album = self.__session.api().get_metadata_4_album(
-                AlbumId.from_hex(album.gid)
+                AlbumId.from_hex(album_group.album[0].gid)
             )
             for disc in album.disc:
                 for track in disc.track:
@@ -373,7 +385,7 @@ class App:
             self.__config.chunk_size,
         )
 
-        if self.__config.save_lyrics and playable.type == PlayableType.TRACK:
+        if self.__config.save_lyrics_file and playable.type == PlayableType.TRACK:
             with Loader("Fetching lyrics..."):
                 try:
                     track.get_lyrics().save(output)
