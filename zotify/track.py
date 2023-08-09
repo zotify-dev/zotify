@@ -113,12 +113,12 @@ def get_song_lyrics(song_id: str, file_save: str) -> None:
         except KeyError:
             raise ValueError(f'Failed to fetch lyrics: {song_id}')
         if(lyrics['lyrics']['syncType'] == "UNSYNCED"):
-            with open(file_save, 'w') as file:
+            with open(file_save, 'w+', encoding='utf-8') as file:
                 for line in formatted_lyrics:
                     file.writelines(line['words'] + '\n')
             return
         elif(lyrics['lyrics']['syncType'] == "LINE_SYNCED"):
-            with open(file_save, 'w') as file:
+            with open(file_save, 'w+', encoding='utf-8') as file:
                 for line in formatted_lyrics:
                     timestamp = int(line['startTimeMs'])
                     ts_minutes = str(math.floor(timestamp / 60000)).zfill(2)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.12
+- Dockerfile works again
+- Fixed lrc file extension replacement
+- Fixed lrc file writes breaking on non-utf8 systems
+
 ## 0.6.11
 - Add new scope for reading followed artists
 - Print API errors by default
