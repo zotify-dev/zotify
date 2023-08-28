@@ -100,7 +100,26 @@ class LocalFile:
             try:
                 f[m.name] = m.value
             except KeyError:
-                pass
+                if m.name == "album_artist":
+                    f["albumartist"] = m.value
+                if m.name == "artists":
+                    f["artist"] = m.value
+                if m.name == "date":
+                    f["year"] = m.value
+                if m.name == "disc":
+                    f["discnumber"] = m.value
+                if m.name == "track_number":
+                    f["tracknumber"] = m.value
+                try:
+                    if m.name == "duration":
+                        f["#length"] = m.value
+                except KeyError:
+                    continue
+                except NotImplementedError:
+                    continue
+                if m.name == "replaygain_track_gain":
+                    f["replaygaintrackgain"] = m.value
+                continue
         try:
             f.save()
         except OggVorbisHeaderError:
