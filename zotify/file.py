@@ -56,7 +56,9 @@ class LocalFile:
             "-i",
             str(self.__path),
         ]
-        path = self.__path.parent.joinpath(self.__path.name.rsplit(".", 1)[0] + ext)
+        path = self.__path.parent.joinpath(
+            f'{self.__path.name.rsplit(".", 1)[0]}.{ext}'
+        )
         if self.__path == path:
             raise TranscodingError(
                 f"Cannot overwrite source, target file {path} already exists."
