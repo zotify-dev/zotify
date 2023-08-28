@@ -65,7 +65,7 @@ class LocalFile:
             )
 
         cmd.extend(["-b:a", str(bitrate) + "k"]) if bitrate > 0 else None
-        cmd.extend(["-c:a", audio_format.value.name]) if audio_format else None
+        cmd.extend(["-c:a", audio_format.value.ext]) if audio_format else None
         cmd.extend(opt_args)
         cmd.append(str(path))
 
