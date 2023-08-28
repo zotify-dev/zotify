@@ -53,6 +53,7 @@ class Printer:
         unit="it",
         unit_scale=False,
         unit_divisor=1000,
+        disable: bool = False,
     ) -> tqdm:
         """
         Prints progress bar
@@ -63,7 +64,7 @@ class Printer:
             iterable=iterable,
             desc=desc,
             total=total,
-            disable=False,  # cls.__config.print_progress,
+            disable=disable,  # cls.__config.print_progress,
             leave=leave,
             position=position,
             unit=unit,

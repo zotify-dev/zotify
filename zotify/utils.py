@@ -15,8 +15,8 @@ BASE62 = Base62.create_instance_with_inverted_character_set()
 
 
 class AudioCodec(NamedTuple):
-    ext: str
     name: str
+    ext: str
 
 
 class AudioFormat(Enum):

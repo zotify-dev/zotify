@@ -82,6 +82,7 @@ class Playable:
         self,
         output: Path,
         chunk_size: int = 128 * 1024,
+        disable_progress_bar: bool = False,
     ) -> LocalFile:
         """
         Writes audio stream to file
@@ -100,6 +101,7 @@ class Playable:
             unit_divisor=1024,
             position=0,
             leave=False,
+            disable=disable_progress_bar,
         ) as p_bar:
             chunk = None
             while chunk != b"":
