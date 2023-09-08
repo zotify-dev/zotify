@@ -19,7 +19,7 @@ from zotify.config import Config
 from zotify.file import TranscodingError
 from zotify.loader import Loader
 from zotify.printer import PrintChannel, Printer
-from zotify.utils import API_URL, AudioFormat, b62_to_hex
+from zotify.utils import API_URL, AudioFormat, MetadataEntry, b62_to_hex
 
 
 class ParseError(ValueError):
@@ -36,7 +36,7 @@ class PlayableData(NamedTuple):
     id: PlayableId
     library: Path
     output: str
-    metadata: dict[str, Any] = {}
+    metadata: list[MetadataEntry] = []
 
 
 class Selection:
@@ -385,7 +385,7 @@ class App:
             self.__config.chunk_size,
         )
 
-        if self.__config.save_lyrics_file and playable.type == PlayableType.TRACK:
+        if playable.type == PlayableType.TRACK and self.__config.lyrics_file:
             with Loader("Fetching lyrics..."):
                 try:
                     track.get_lyrics().save(output)

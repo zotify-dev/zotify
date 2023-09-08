@@ -5,15 +5,16 @@ from pathlib import Path
 
 from zotify.app import App
 from zotify.config import CONFIG_PATHS, CONFIG_VALUES
-from zotify.utils import OptionalOrFalse
+from zotify.utils import OptionalOrFalse, SimpleHelpFormatter
 
-VERSION = "0.9.2"
+VERSION = "0.9.3"
 
 
 def main():
     parser = ArgumentParser(
         prog="zotify",
         description="A fast and customizable music and podcast downloader",
+        formatter_class=SimpleHelpFormatter,
     )
     parser.add_argument(
         "-v",
@@ -39,7 +40,7 @@ def main():
         help="Specify a path to the root of a music/playlist/podcast library",
     )
     parser.add_argument(
-        "-o", "--output", type=str, help="Specify the output location/format"
+        "-o", "--output", type=str, help="Specify the output file structure/format"
     )
     parser.add_argument(
         "-c",
@@ -101,7 +102,7 @@ def main():
     for k, v in CONFIG_VALUES.items():
         if v["type"] == bool:
             parser.add_argument(
-                v["arg"],
+                *v["args"],
                 action=OptionalOrFalse,
                 default=v["default"],
                 help=v["help"],
@@ -109,7 +110,7 @@ def main():
         else:
             try:
                 parser.add_argument(
-                    v["arg"],
+                    *v["args"],
                     type=v["type"],
                     choices=v["choices"],
                     default=None,
@@ -117,7 +118,7 @@ def main():
                 )
             except KeyError:
                 parser.add_argument(
-                    v["arg"],
+                    *v["args"],
                     type=v["type"],
                     default=None,
                     help=v["help"],

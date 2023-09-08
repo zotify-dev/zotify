@@ -63,7 +63,7 @@ class Printer:
             iterable=iterable,
             desc=desc,
             total=total,
-            disable=False,  # cls.__config.print_progress,
+            disable=not cls.__config.print_progress,
             leave=leave,
             position=position,
             unit=unit,

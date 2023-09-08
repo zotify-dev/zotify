@@ -2,7 +2,7 @@
 
 ## v1.0.0
 
-An unexpected reboot
+An unexpected reboot.
 
 ### BREAKING CHANGES AHEAD
 
@@ -29,9 +29,14 @@ An unexpected reboot
 ### Additions
 
 - Added new command line arguments
-  - `--library`/`-l` overrides both `music_library` and `podcast_library` options similar to `--output`
+  - `--library`/`-l` overrides both `music_library` and `podcast_library` options similar to `--output`/`-o`
   - `--category`/`-c` will limit search results to a certain type, accepted values are "album", "artist", "playlist", "track", "show", "episode". Accepts multiple choices.
   - `--debug` shows full tracebacks on crash instead of just the final error message
+  - Added new shorthand aliases to some options:
+    - `-oa` = `--output-album`
+    - `-opt` = `--output-playlist-track`
+    - `-ope` = `--output-playlist-episode`
+    - `-op` = `--output-podcast`
 - Search results can be narrowed down using search filters
   - Available filters are 'album', 'artist', 'track', 'year', 'upc', 'tag:hipster', 'tag:new', 'isrc', and 'genre'.
   - The 'artist' and 'year' filters only shows results from the given year or a range (e.g. 1970-1982).

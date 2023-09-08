@@ -1,7 +1,9 @@
-from argparse import Action, ArgumentError
+from argparse import Action, ArgumentError, HelpFormatter
 from enum import Enum, IntEnum
 from re import IGNORECASE, sub
+from sys import exit
 from sys import platform as PLATFORM
+from sys import stderr
 from typing import Any, NamedTuple
 
 from librespot.audio.decoders import AudioQuality
@@ -15,8 +17,8 @@ BASE62 = Base62.create_instance_with_inverted_character_set()
 
 
 class AudioCodec(NamedTuple):
-    ext: str
     name: str
+    ext: str
 
 
 class AudioFormat(Enum):
@@ -69,6 +71,43 @@ class ImageSize(IntEnum):
             return s
 
 
+class MetadataEntry:
+    name: str
+    value: Any
+    output: str
+
+    def __init__(self, name: str, value: Any, output_value: str | None = None):
+        """
+        Holds metadata entries
+        args:
+            name: name of metadata key
+            value: Value to use in metadata tags
+            output_value: Value when used in output formatting, if none is provided
+            will use value from previous argument.
+        """
+        self.name = name
+
+        if type(value) == list:
+            value = "\0".join(value)
+        self.value = value
+
+        if output_value is None:
+            output_value = self.value
+        elif output_value == "":
+            output_value = None
+        if type(output_value) == list:
+            output_value = ", ".join(output_value)
+        self.output = str(output_value)
+
+
+class SimpleHelpFormatter(HelpFormatter):
+    def _format_usage(self, usage, actions, groups, prefix):
+        if usage is not None:
+            super()._format_usage(usage, actions, groups, prefix)
+        stderr.write('zotify: error: unrecognized arguments - try "zotify -h"\n')
+        exit(2)
+
+
 class OptionalOrFalse(Action):
     def __init__(
         self,
@@ -103,36 +142,13 @@ class OptionalOrFalse(Action):
         )
 
     def __call__(self, parser, namespace, values, option_string=None):
-        if values is None and not option_string.startswith("--no-"):
-            raise ArgumentError(self, "expected 1 argument")
+        if values is not None:
+            raise ArgumentError(self, "expected 0 arguments")
         setattr(
             namespace,
             self.dest,
-            values if not option_string.startswith("--no-") else False,
+            True if not option_string.startswith("--no-") else False,
         )
-
-
-class MetadataEntry:
-    def __init__(self, name: str, value: Any, output_value: str | None = None):
-        """
-        Holds metadata entries
-        args:
-            name: name of metadata key
-            tag_val: Value to use in metadata tags
-            output_value: Value when used in output formatting
-        """
-        self.name = name
-        if type(value) == list:
-            value = "\0".join(value)
-        self.value = value
-
-        if output_value is None:
-            output_value = value
-        if output_value == "":
-            output_value = None
-        if type(output_value) == list:
-            output_value = ", ".join(output_value)
-        self.output = str(output_value)
 
 
 def fix_filename(filename: str, substitute: str = "_", platform: str = PLATFORM) -> str:

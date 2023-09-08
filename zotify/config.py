@@ -17,6 +17,7 @@ DOWNLOAD_QUALITY = "download_quality"
 FFMPEG_ARGS = "ffmpeg_args"
 FFMPEG_PATH = "ffmpeg_path"
 LANGUAGE = "language"
+LYRICS_FILE = "lyrics_file"
 LYRICS_ONLY = "lyrics_only"
 MUSIC_LIBRARY = "music_library"
 OUTPUT = "output"
@@ -34,7 +35,6 @@ PRINT_PROGRESS = "print_progress"
 PRINT_SKIPS = "print_skips"
 PRINT_WARNINGS = "print_warnings"
 REPLACE_EXISTING = "replace_existing"
-SAVE_LYRICS_FILE = "save_lyrics_file"
 SAVE_METADATA = "save_metadata"
 SAVE_SUBTITLES = "save_subtitles"
 SKIP_DUPLICATES = "skip_duplicates"
@@ -72,190 +72,190 @@ CONFIG_VALUES = {
     CREDENTIALS: {
         "default": CONFIG_PATHS["creds"],
         "type": Path,
-        "arg": "--credentials",
+        "args": ["--credentials"],
         "help": "Path to credentials file",
     },
     PATH_ARCHIVE: {
         "default": CONFIG_PATHS["archive"],
         "type": Path,
-        "arg": "--archive",
+        "args": ["--archive"],
         "help": "Path to track archive file",
     },
     MUSIC_LIBRARY: {
         "default": LIBRARY_PATHS["music"],
         "type": Path,
-        "arg": "--music-library",
+        "args": ["--music-library"],
         "help": "Path to root of music library",
     },
     PODCAST_LIBRARY: {
         "default": LIBRARY_PATHS["podcast"],
         "type": Path,
-        "arg": "--podcast-library",
+        "args": ["--podcast-library"],
         "help": "Path to root of podcast library",
     },
     PLAYLIST_LIBRARY: {
         "default": LIBRARY_PATHS["playlist"],
         "type": Path,
-        "arg": "--playlist-library",
+        "args": ["--playlist-library"],
         "help": "Path to root of playlist library",
     },
     OUTPUT_ALBUM: {
         "default": OUTPUT_PATHS["album"],
         "type": str,
-        "arg": "--output-album",
+        "args": ["--output-album", "-oa"],
         "help": "File layout for saved albums",
     },
     OUTPUT_PLAYLIST_TRACK: {
         "default": OUTPUT_PATHS["playlist_track"],
         "type": str,
-        "arg": "--output-playlist-track",
+        "args": ["--output-playlist-track", "-opt"],
         "help": "File layout for tracks in a playlist",
     },
     OUTPUT_PLAYLIST_EPISODE: {
         "default": OUTPUT_PATHS["playlist_episode"],
         "type": str,
-        "arg": "--output-playlist-episode",
+        "args": ["--output-playlist-episode", "-ope"],
         "help": "File layout for episodes in a playlist",
     },
     OUTPUT_PODCAST: {
         "default": OUTPUT_PATHS["podcast"],
         "type": str,
-        "arg": "--output-podcast",
+        "args": ["--output-podcast", "-op"],
         "help": "File layout for saved podcasts",
     },
     DOWNLOAD_QUALITY: {
         "default": "auto",
         "type": Quality.from_string,
         "choices": list(Quality),
-        "arg": "--download-quality",
+        "args": ["--download-quality"],
         "help": "Audio download quality (auto for highest available)",
     },
     ARTWORK_SIZE: {
         "default": "large",
         "type": ImageSize.from_string,
         "choices": list(ImageSize),
-        "arg": "--artwork-size",
+        "args": ["--artwork-size"],
         "help": "Image size of track's cover art",
     },
     AUDIO_FORMAT: {
         "default": "vorbis",
         "type": AudioFormat,
         "choices": [n.value.name for n in AudioFormat],
-        "arg": "--audio-format",
+        "args": ["--audio-format"],
         "help": "Audio format of final track output",
     },
     TRANSCODE_BITRATE: {
         "default": -1,
         "type": int,
-        "arg": "--bitrate",
+        "args": ["--bitrate"],
         "help": "Transcoding bitrate (-1 to use download rate)",
     },
     FFMPEG_PATH: {
         "default": "",
         "type": str,
-        "arg": "--ffmpeg-path",
+        "args": ["--ffmpeg-path"],
         "help": "Path to ffmpeg binary",
     },
     FFMPEG_ARGS: {
         "default": "",
         "type": str,
-        "arg": "--ffmpeg-args",
+        "args": ["--ffmpeg-args"],
         "help": "Additional ffmpeg arguments when transcoding",
     },
     SAVE_SUBTITLES: {
         "default": False,
         "type": bool,
-        "arg": "--save-subtitles",
+        "args": ["--save-subtitles"],
         "help": "Save subtitles from podcasts to a .srt file",
     },
     LANGUAGE: {
         "default": "en",
         "type": str,
-        "arg": "--language",
+        "args": ["--language"],
         "help": "Language for metadata",
     },
-    SAVE_LYRICS_FILE: {
-        "default": True,
+    LYRICS_FILE: {
+        "default": False,
         "type": bool,
-        "arg": "--save-lyrics-file",
+        "args": ["--lyrics-file"],
         "help": "Save lyrics to a file",
     },
     LYRICS_ONLY: {
         "default": False,
         "type": bool,
-        "arg": "--lyrics-only",
+        "args": ["--lyrics-only"],
         "help": "Only download lyrics and not actual audio",
     },
     CREATE_PLAYLIST_FILE: {
         "default": True,
         "type": bool,
-        "arg": "--playlist-file",
+        "args": ["--playlist-file"],
         "help": "Save playlist information to an m3u8 file",
     },
     SAVE_METADATA: {
         "default": True,
         "type": bool,
-        "arg": "--save-metadata",
+        "args": ["--save-metadata"],
         "help": "Save metadata, required for other metadata options",
     },
     ALL_ARTISTS: {
         "default": True,
         "type": bool,
-        "arg": "--all-artists",
+        "args": ["--all-artists"],
         "help": "Add all track artists to artist tag in metadata",
     },
     REPLACE_EXISTING: {
         "default": False,
         "type": bool,
-        "arg": "--replace-existing",
+        "args": ["--replace-existing"],
         "help": "Overwrite existing files with the same name",
     },
     SKIP_PREVIOUS: {
         "default": True,
         "type": bool,
-        "arg": "--skip-previous",
+        "args": ["--skip-previous"],
         "help": "Skip previously downloaded songs",
     },
     SKIP_DUPLICATES: {
         "default": True,
         "type": bool,
-        "arg": "--skip-duplicates",
+        "args": ["--skip-duplicates"],
         "help": "Skip downloading existing track to different album",
     },
     CHUNK_SIZE: {
-        "default": 131072,
+        "default": 16384,
         "type": int,
-        "arg": "--chunk-size",
+        "args": ["--chunk-size"],
         "help": "Number of bytes read at a time during download",
     },
     PRINT_DOWNLOADS: {
         "default": False,
         "type": bool,
-        "arg": "--print-downloads",
+        "args": ["--print-downloads"],
         "help": "Print messages when a song is finished downloading",
     },
     PRINT_PROGRESS: {
         "default": True,
         "type": bool,
-        "arg": "--print-progress",
+        "args": ["--print-progress"],
         "help": "Show progress bars",
     },
     PRINT_SKIPS: {
         "default": False,
         "type": bool,
-        "arg": "--print-skips",
+        "args": ["--print-skips"],
         "help": "Show messages if a song is being skipped",
     },
     PRINT_WARNINGS: {
         "default": True,
         "type": bool,
-        "arg": "--print-warnings",
+        "args": ["--print-warnings"],
         "help": "Show warnings",
     },
     PRINT_ERRORS: {
         "default": True,
         "type": bool,
-        "arg": "--print-errors",
+        "args": ["--print-errors"],
         "help": "Show errors",
     },
 }
@@ -272,6 +272,7 @@ class Config:
     ffmpeg_path: str
     music_library: Path
     language: str
+    lyrics_file: bool
     output_album: str
     output_liked: str
     output_podcast: str
@@ -280,7 +281,6 @@ class Config:
     playlist_library: Path
     podcast_library: Path
     print_progress: bool
-    save_lyrics_file: bool
     save_metadata: bool
     transcode_bitrate: int
 
@@ -303,6 +303,8 @@ class Config:
                         jsonvalues[key] = str(CONFIG_VALUES[key]["default"])
                 with open(self.__config_file, "w+", encoding="utf-8") as conf:
                     dump(jsonvalues, conf, indent=4)
+        else:
+            self.__config_file = None
 
         for key in CONFIG_VALUES:
             # Override config with commandline arguments
@@ -318,10 +320,14 @@ class Config:
                     key,
                     self.__parse_arg_value(key, CONFIG_VALUES[key]["default"]),
                 )
-        else:
-            self.__config_file = None
 
-        # Make "output" arg override all output_* options
+        # "library" arg overrides all *_library options
+        if args.library:
+            self.music_library = args.library
+            self.playlist_library = args.library
+            self.podcast_library = args.library
+
+        # "output" arg overrides all output_* options
         if args.output:
             self.output_album = args.output
             self.output_liked = args.output
