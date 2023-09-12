@@ -94,6 +94,8 @@ You can find the configuration file in following locations:
 | MacOS           | `/Users/<USERNAME>/.config/zotify/config.json`          |
 | Linux           | `/home/<USERNAME>/.config/zotify/config.json`           |
 
+To log out, just remove the configuration file.
+
 ### Output format
 
 With the option `OUTPUT` (or the commandline parameter `--output`) you can specify the output location and format.  
