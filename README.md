@@ -33,6 +33,8 @@ Installation:
 python -m pip install git+https://zotify.xyz/zotify/zotify.git
 ```
 
+See [INSTALLATION](INSTALLATION.md) for a more detailed and opinionated installation walkthrough.
+
 ### Command line usage
 
 ```
@@ -121,10 +123,8 @@ Example values could be:
 ~~~~
 {playlist}/{artist} - {song_name}.{ext}
 {playlist}/{playlist_num} - {artist} - {song_name}.{ext}
-Bangers/{artist} - {song_name}.{ext}
 {artist} - {song_name}.{ext}
 {artist}/{album}/{album_num} - {artist} - {song_name}.{ext}
-/home/user/downloads/{artist} - {song_name} [{id}].{ext}
 ~~~~
 
 ### Docker Usage
