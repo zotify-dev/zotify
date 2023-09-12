@@ -40,8 +40,8 @@ Basic command line usage:
   zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
 
 Basic options:
-  (nothing)        Download the tracks/alumbs/playlists URLs from the parameter
-  -d, --download   Download all tracks/alumbs/playlists URLs from the specified file
+  (nothing)        Download the tracks/albums/playlists URLs from the parameter
+  -d, --download   Download all tracks/albums/playlists URLs from the specified file
   -p, --playlist   Downloads a saved playlist from your account
   -l, --liked      Downloads all the liked songs from your account
   -f, --followed   Downloads all songs by all artists you follow
