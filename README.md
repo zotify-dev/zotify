@@ -3,10 +3,10 @@
 ### A highly customizable music and podcast downloader.
 
 <p align="center">
-  <img src="https://i.imgur.com/hGXQWSl.png" width="50%">
+  <img src="https://i.imgur.com/hGXQWSl.png" width="50%" alt="Zotify logo">
 </p>
 
-### Featues
+### Features
   - Downloads at up to 320kbps*
   - Downloads directly from the source**
   - Downloads podcasts, playlists, liked songs, albums, artists, singles.
@@ -40,12 +40,13 @@ Basic command line usage:
   zotify <track/album/playlist/episode/artist url>   Downloads the track, album, playlist or podcast episode specified as a command line argument. If an artist url is given, all albums by specified artist will be downloaded. Can take multiple urls.
 
 Basic options:
-  (nothing)        Download the tracks/alumbs/playlists URLs from the parameter
-  -d, --download   Download all tracks/alumbs/playlists URLs from the specified file
+  (nothing)        Download the tracks/albums/playlists URLs from the parameter
+  -d, --download   Download all tracks/albums/playlists URLs from the specified file
   -p, --playlist   Downloads a saved playlist from your account
   -l, --liked      Downloads all the liked songs from your account
   -f, --followed   Downloads all songs by all artists you follow
-  -s, --search     Searches for specified track, album, artist or playlist, loads search prompt if none are given.
+  -s, --search     Searches for specified track, album, artist or playlist, loads search prompt if none are given.  
+  -h, --help       See this message.
 ```
 
 ### Options
@@ -67,7 +68,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
 | DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very_high*)
 | TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
-| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
+| SKIP_EXISTING_FILES          | --skip-existing                  | Skip songs with the same name
 | SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
 | RETRY_ATTEMPTS               | --retry-attempts                 | Number of times Zotify will retry a failed request
 | BULK_WAIT_TIME               | --bulk-wait-time                 | The wait time between bulk downloads
@@ -82,7 +83,18 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
 | TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
 
-*very-high is limited to premium only
+*very-high is limited to premium only  
+
+### Configuration 
+
+You can find the configuration file in following locations:  
+| OS              | Location          
+|-----------------|---------------------------------------------------------|
+| Windows         | `C:\Users\<USERNAME>\AppData\Roaming\Zotify\config.json`|
+| MacOS           | `/Users/<USERNAME>/.config/zotify/config.json`          |
+| Linux           | `/home/<USERNAME>/.config/zotify/config.json`           |
+
+To log out, just remove the configuration file. Uninstalling Zotify does not remove the config file.
 
 ### Output format
 
@@ -133,7 +145,7 @@ If you see this, don't worry! Just try logging back in. If you see the incorrect
 Currently no user has reported their account getting banned after using Zotify.
 
 It is recommended you use Zotify with a burner account.
-Alternatively, there is a configuration option labled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus appearing less suspicious.
+Alternatively, there is a configuration option labeled ```DOWNLOAD_REAL_TIME```, this limits the download speed to the duration of the song being downloaded thus appearing less suspicious.
 This option is much slower and is only recommended for premium users who wish to download songs in 320kbps without buying premium on a burner account.
 
 ### Disclaimer

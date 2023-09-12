@@ -152,7 +152,7 @@ def search(search_term):
             try:
                 int(splits[index+1])
             except ValueError:
-                raise ValueError('Paramater passed after {} option must be an integer.\n'.
+                raise ValueError('Parameter passed after {} option must be an integer.\n'.
                                  format(split))
             if int(splits[index+1]) > 50:
                 raise ValueError('Invalid limit passed. Max is 50.\n')
