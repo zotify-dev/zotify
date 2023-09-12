@@ -68,7 +68,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
 | DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very_high*)
 | TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
-| SKIP_EXISTING_FILES          | --skip-existing-files            | Skip songs with the same name
+| SKIP_EXISTING_FILES          | --skip-existing                  | Skip songs with the same name
 | SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
 | RETRY_ATTEMPTS               | --retry-attempts                 | Number of times Zotify will retry a failed request
 | BULK_WAIT_TIME               | --bulk-wait-time                 | The wait time between bulk downloads
