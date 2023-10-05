@@ -91,10 +91,10 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 
 You can find the configuration file in following locations:  
 | OS              | Location          
-|-----------------|---------------------------------------------------------|
-| Windows         | `C:\Users\<USERNAME>\AppData\Roaming\Zotify\config.json`|
-| MacOS           | `/Users/<USERNAME>/.config/zotify/config.json`          |
-| Linux           | `/home/<USERNAME>/.config/zotify/config.json`           |
+|-----------------|-------------------------------------------------------------------|
+| Windows         | `C:\Users\<USERNAME>\AppData\Roaming\Zotify\config.json`          |
+| MacOS           | `/Users/<USERNAME>/Library/ApplicationSupport/Zotify/config.json` |
+| Linux           | `/home/<USERNAME>/.config/zotify/config.json`                     |
 
 To log out, just remove the configuration file. Uninstalling Zotify does not remove the config file.
 
