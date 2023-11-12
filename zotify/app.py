@@ -54,7 +54,7 @@ def client(args) -> None:
 
     if args.liked_songs:
         for song in get_saved_tracks():
-            if not song[TRACK][NAME] or not song[TRACK][ID]:
+            if not song.get(TRACK) or not song[TRACK].get(NAME) or not song[TRACK].get(ID):
                 Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
             else:
                 download_track('liked', song[TRACK][ID])
@@ -105,7 +105,7 @@ def download_from_urls(urls: list[str]) -> bool:
             enum = 1
             char_num = len(str(len(playlist_songs)))
             for song in playlist_songs:
-                if not song[TRACK][NAME] or not song[TRACK][ID]:
+                if not song.get(TRACK) or not song[TRACK].get(NAME) or not song[TRACK].get(ID):
                     Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                 else:
                     if song[TRACK][TYPE] == "episode": # Playlist item is a podcast episode
