@@ -274,7 +274,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{Path(filename).relative_to(Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
 
                     # add song id to archive file
-                    if Zotify.CONFIG.get_skip_previously_downloaded():
+                    if not check_all_time:
                         add_to_archive(scraped_song_id, PurePath(filename).name, artists[0], name)
                     # add song id to download directory's .song_ids file
                     if not check_id:
