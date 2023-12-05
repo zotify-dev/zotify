@@ -141,6 +141,17 @@ def get_song_duration(song_id: str) -> float:
 
     return duration
 
+# Function to sanitize strings for filenames or directories
+def sanitize_string(s):
+    # Check if the input is a string or bytes-like object
+    if isinstance(s, (str, bytes)):
+        # Replace invalid characters with underscores
+        return re.sub(r'[\/:*?"<>|]', '_', s)
+    else:
+        # Handle cases where the input is not a string or bytes-like object
+        return str(s)
+
+
 
 def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=False) -> None:
     """ Downloads raw song audio from Spotify """
@@ -187,12 +198,17 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
         # a song with the same name is installed
         if not check_id and check_name:
-            c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
+            c = len([file for file in Path(filedir).iterdir() if re.search(re.escape(f'{filename}_'), str(file))]) + 1
 
             fname = PurePath(PurePath(filename).name).parent
             ext = PurePath(PurePath(filename).name).suffix
 
-            filename = PurePath(filedir).joinpath(f'{fname}_{c}{ext}')
+            # Sanitize the strings before constructing the file path
+            sanitized_fname = sanitize_string(fname)
+            sanitized_ext = sanitize_string(ext)
+
+            filename = PurePath(filedir).joinpath(f'{sanitized_fname}_{c}{sanitized_ext}')
+
 
     except Exception as e:
         Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
@@ -267,7 +283,8 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         Printer.print(PrintChannel.ERRORS, "Unable to write metadata, ensure ffmpeg is installed and added to your PATH.")
 
                     if filename_temp != filename:
-                        Path(filename_temp).rename(filename)
+                        import shutil
+                        shutil.move(filename_temp, filename)
 
                     time_finished = time.time()
 
