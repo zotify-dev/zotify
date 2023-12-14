@@ -1,7 +1,7 @@
 from zotify.const import ITEMS, ID, TRACK, NAME
 from zotify.termoutput import Printer
 from zotify.track import download_track
-from zotify.utils import split_input
+from zotify.utils import split_input, strptime_utc
 from zotify.zotify import Zotify
 
 MY_PLAYLISTS_URL = 'https://api.spotify.com/v1/me/playlists'
@@ -36,6 +36,8 @@ def get_playlist_songs(playlist_id):
         songs.extend(resp[ITEMS])
         if len(resp[ITEMS]) < limit:
             break
+
+    songs.sort(key=lambda s: strptime_utc(s['added_at']), reverse=True)
 
     return songs
 
