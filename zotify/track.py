@@ -166,6 +166,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
         ext = EXT_MAP.get(Zotify.CONFIG.get_download_format().lower())
 
         output_template = output_template.replace("{artist}", fix_filename(artists[0]))
+        output_template = output_template.replace("{artists}", fix_filename(', '.join(artists)))
         output_template = output_template.replace("{album}", fix_filename(album_name))
         output_template = output_template.replace("{song_name}", fix_filename(name))
         output_template = output_template.replace("{release_year}", fix_filename(release_year))
