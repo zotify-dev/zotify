@@ -12,7 +12,7 @@ import music_tag
 import requests
 
 from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, ARTWORK, \
-    WINDOWS_SYSTEM, ALBUMARTIST
+    WINDOWS_SYSTEM, LINUX_SYSTEM, ALBUMARTIST
 from zotify.zotify import Zotify
 
 
@@ -258,7 +258,12 @@ def fix_filename(name):
     >>> all('_' == fix_filename(chr(i)) for i in list(range(32)))
     True
     """
-    return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
+    if platform.system() == WINDOWS_SYSTEM:
+        return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
+    elif platform.system() == LINUX_SYSTEM:
+        return re.sub(r'[/\0]', "_", str(name))
+    else: # MacOS
+        return re.sub(r'[/:\0]', "_", str(name))
 
 
 def fmt_seconds(secs: float) -> str:

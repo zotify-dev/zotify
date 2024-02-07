@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.13
+- Only replace chars with _ when required
+- Added defaults to README
+
 ## 0.6.12
 - Dockerfile works again
 - Fixed lrc file extension replacement

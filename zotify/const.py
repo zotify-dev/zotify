@@ -92,6 +92,8 @@ USER_LIBRARY_READ = 'user-library-read'
 
 WINDOWS_SYSTEM = 'Windows'
 
+LINUX_SYSTEM = 'Linux'
+
 CODEC_MAP = {
     'aac': 'aac',
     'fdk_aac': 'libfdk_aac',
