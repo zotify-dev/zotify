@@ -56,34 +56,34 @@ Basic options:
 All these options can either be configured in the config or via the commandline, in case of both the commandline-option has higher priority.  
 Be aware you have to set boolean values in the commandline like this: `--download-real-time=True`
 
-| Key (config)                 | commandline parameter            | Description
-|------------------------------|----------------------------------|---------------------------------------------------------------------|
-| CREDENTIALS_LOCATION         | --credentials-location           | The location of the credentials.json
-| OUTPUT                       | --output                         | The output location/format (see below)
-| SONG_ARCHIVE                 | --song-archive                   | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
-| ROOT_PATH                    | --root-path                      | Directory where Zotify saves music
-| ROOT_PODCAST_PATH            | --root-podcast-path              | Directory where Zotify saves podcasts
-| SPLIT_ALBUM_DISCS            | --split-album-discs              | Saves each disk in its own folder
-| DOWNLOAD_LYRICS              | --download-lyrics                | Downloads synced lyrics in .lrc format, uses unsynced as fallback.
-| MD_ALLGENRES                 | --md-allgenres                   | Save all relevant genres in metadata
-| MD_GENREDELIMITER            | --md-genredelimiter              | Delimiter character used to split genres in metadata
-| DOWNLOAD_FORMAT              | --download-format                | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
-| DOWNLOAD_QUALITY             | --download-quality               | Audio quality of downloaded songs (normal, high, very_high*)
-| TRANSCODE_BITRATE            | --transcode-bitrate              | Overwrite the bitrate for ffmpeg encoding
-| SKIP_EXISTING_FILES          | --skip-existing                  | Skip songs with the same name
-| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | Use a song_archive file to skip previously downloaded songs
-| RETRY_ATTEMPTS               | --retry-attempts                 | Number of times Zotify will retry a failed request
-| BULK_WAIT_TIME               | --bulk-wait-time                 | The wait time between bulk downloads
-| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | Totally disable wait time between songs with the risk of instability
-| CHUNK_SIZE                   | --chunk-size                     | Chunk size for downloading
-| DOWNLOAD_REAL_TIME           | --download-real-time             | Downloads songs as fast as they would be played, should prevent account bans.
-| LANGUAGE                     | --language                       | Language for spotify metadata
-| PRINT_SPLASH                 | --print-splash                   | Show the Zotify logo at startup
-| PRINT_SKIPS                  | --print-skips                    | Show messages if a song is being skipped
-| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | Show download/playlist progress bars
-| PRINT_ERRORS                 | --print-errors                   | Show errors
-| PRINT_DOWNLOADS              | --print-downloads                | Print messages when a song is finished downloading
-| TEMP_DOWNLOAD_DIR            | --temp-download-dir              | Download tracks to a temporary directory first
+| Key (config)                 | Commandline parameter            | Defaults | Description
+|------------------------------|----------------------------------|----------|---------------------------------------------------------------------|
+| CREDENTIALS_LOCATION         | --credentials-location           |          | The location of the credentials.json
+| OUTPUT                       | --output                         |          | The output location/format (see below)
+| SONG_ARCHIVE                 | --song-archive                   |          | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
+| ROOT_PATH                    | --root-path                      |          | Directory where Zotify saves music
+| ROOT_PODCAST_PATH            | --root-podcast-path              |          | Directory where Zotify saves podcasts
+| SPLIT_ALBUM_DISCS            | --split-album-discs              | False    | Saves each disk in its own folder
+| DOWNLOAD_LYRICS              | --download-lyrics                | True     | Downloads synced lyrics in .lrc format, uses unsynced as fallback.
+| MD_ALLGENRES                 | --md-allgenres                   | False    | Save all relevant genres in metadata
+| MD_GENREDELIMITER            | --md-genredelimiter              | ,        | Delimiter character used to split genres in metadata
+| DOWNLOAD_FORMAT              | --download-format                | ogg      | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
+| DOWNLOAD_QUALITY             | --download-quality               | auto     | Audio quality of downloaded songs (normal, high, very_high*)
+| TRANSCODE_BITRATE            | --transcode-bitrate              | auto     | Overwrite the bitrate for ffmpeg encoding
+| SKIP_EXISTING_FILES          | --skip-existing                  | True     | Skip songs with the same name
+| SKIP_PREVIOUSLY_DOWNLOADED   | --skip-previously-downloaded     | False    | Use a song_archive file to skip previously downloaded songs
+| RETRY_ATTEMPTS               | --retry-attempts                 | 1        | Number of times Zotify will retry a failed request
+| BULK_WAIT_TIME               | --bulk-wait-time                 | 1        | The wait time between bulk downloads
+| OVERRIDE_AUTO_WAIT           | --override-auto-wait             | False    | Totally disable wait time between songs with the risk of instability
+| CHUNK_SIZE                   | --chunk-size                     | 20000    | Chunk size for downloading
+| DOWNLOAD_REAL_TIME           | --download-real-time             | False    | Downloads songs as fast as they would be played, should prevent account bans.
+| LANGUAGE                     | --language                       | en       | Language for spotify metadata
+| PRINT_SPLASH                 | --print-splash                   | False    | Show the Zotify logo at startup
+| PRINT_SKIPS                  | --print-skips                    | True     | Show messages if a song is being skipped
+| PRINT_DOWNLOAD_PROGRESS      | --print-download-progress        | True     | Show download/playlist progress bars
+| PRINT_ERRORS                 | --print-errors                   | True     | Show errors
+| PRINT_DOWNLOADS              | --print-downloads                | False    | Print messages when a song is finished downloading
+| TEMP_DOWNLOAD_DIR            | --temp-download-dir              |          | Download tracks to a temporary directory first
 
 *very-high is limited to premium only  
 
