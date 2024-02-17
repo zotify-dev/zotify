@@ -7,7 +7,7 @@ from zotify.app import App
 from zotify.config import CONFIG_PATHS, CONFIG_VALUES
 from zotify.utils import OptionalOrFalse, SimpleHelpFormatter
 
-VERSION = "0.9.3"
+VERSION = "0.9.4"
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Don't hide tracebacks",
+        help="Display full tracebacks",
     )
     parser.add_argument(
         "--config",
@@ -138,8 +138,9 @@ def main():
             from traceback import format_exc
 
             print(format_exc().splitlines()[-1])
+            exit(1)
         except KeyboardInterrupt:
-            print("goodbye")
+            exit(130)
 
 
 if __name__ == "__main__":

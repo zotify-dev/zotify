@@ -3,24 +3,25 @@ from __future__ import annotations
 from pathlib import Path
 
 from librespot.audio.decoders import VorbisOnlyAudioQuality
-from librespot.core import ApiClient, PlayableContentFeeder
+from librespot.core import ApiClient, ApResolver, PlayableContentFeeder
 from librespot.core import Session as LibrespotSession
 from librespot.metadata import EpisodeId, PlayableId, TrackId
 from pwinput import pwinput
 from requests import HTTPError, get
 
+from zotify.loader import Loader
 from zotify.playable import Episode, Track
-from zotify.utils import API_URL, Quality
+from zotify.utils import Quality
+
+API_URL = "https://api.sp" + "otify.com/v1/"
 
 
 class Api(ApiClient):
-    def __init__(self, session: LibrespotSession, language: str = "en"):
+    def __init__(self, session: Session):
         super(Api, self).__init__(session)
         self.__session = session
-        self.__language = language
 
     def __get_token(self) -> str:
-        """Returns user's API token"""
         return (
             self.__session.tokens()
             .get_token(
@@ -40,25 +41,25 @@ class Api(ApiClient):
         offset: int = 0,
     ) -> dict:
         """
-        Requests data from api
+        Requests data from API
         Args:
-            url: API url and to get data from
+            url: API URL and to get data from
             params: parameters to be sent in the request
             limit: The maximum number of items in the response
             offset: The offset of the items returned
         Returns:
-            Dictionary representation of json response
+            Dictionary representation of JSON response
         """
         headers = {
             "Authorization": f"Bearer {self.__get_token()}",
             "Accept": "application/json",
-            "Accept-Language": self.__language,
+            "Accept-Language": self.__session.language(),
             "app-platform": "WebPlayer",
         }
         params["limit"] = limit
         params["offset"] = offset
 
-        response = get(url, headers=headers, params=params)
+        response = get(API_URL + url, headers=headers, params=params)
         data = response.json()
 
         try:
@@ -69,30 +70,39 @@ class Api(ApiClient):
             return data
 
 
-class Session:
+class Session(LibrespotSession):
     def __init__(
-        self,
-        librespot_session: LibrespotSession,
-        language: str = "en",
+        self, session_builder: LibrespotSession.Builder, language: str = "en"
     ) -> None:
         """
         Authenticates user, saves credentials to a file and generates api token.
         Args:
-            session_builder: An instance of the Librespot Session.Builder
+            session_builder: An instance of the Librespot Session builder
             langauge: ISO 639-1 language code
         """
-        self.__session = librespot_session
-        self.__language = language
-        self.__api = Api(self.__session, language)
-        self.__country = self.api().invoke_url(API_URL + "me")["country"]
+        with Loader("Logging in..."):
+            super(Session, self).__init__(
+                LibrespotSession.Inner(
+                    session_builder.device_type,
+                    session_builder.device_name,
+                    session_builder.preferred_locale,
+                    session_builder.conf,
+                    session_builder.device_id,
+                ),
+                ApResolver.get_random_accesspoint(),
+            )
+            self.connect()
+            self.authenticate(session_builder.login_credentials)
+            self.__api = Api(self)
+            self.__language = language
 
     @staticmethod
-    def from_file(cred_file: Path, langauge: str = "en") -> Session:
+    def from_file(cred_file: Path, language: str = "en") -> Session:
         """
         Creates session using saved credentials file
         Args:
             cred_file: Path to credentials file
-            langauge: ISO 639-1 language code for API responses
+            language: ISO 639-1 language code for API responses
         Returns:
             Zotify session
         """
@@ -102,12 +112,12 @@ class Session:
             .build()
         )
         session = LibrespotSession.Builder(conf).stored_file(str(cred_file))
-        return Session(session.create(), langauge)
+        return Session(session, language)
 
     @staticmethod
     def from_userpass(
-        username: str = "",
-        password: str = "",
+        username: str,
+        password: str,
         save_file: Path | None = None,
         language: str = "en",
     ) -> Session:
@@ -117,15 +127,10 @@ class Session:
             username: Account username
             password: Account password
             save_file: Path to save login credentials to, optional.
-            langauge: ISO 639-1 language code for API responses
+            language: ISO 639-1 language code for API responses
         Returns:
             Zotify session
         """
-        username = input("Username: ") if username == "" else username
-        password = (
-            pwinput(prompt="Password: ", mask="*") if password == "" else password
-        )
-
         builder = LibrespotSession.Configuration.Builder()
         if save_file:
             save_file.parent.mkdir(parents=True, exist_ok=True)
@@ -136,21 +141,35 @@ class Session:
         session = LibrespotSession.Builder(builder.build()).user_pass(
             username, password
         )
-        return Session(session.create(), language)
+        return Session(session, language)
+
+    @staticmethod
+    def from_prompt(save_file: Path | None = None, language: str = "en") -> Session:
+        """
+        Creates a session with username + password supplied from CLI prompt
+        Args:
+            save_file: Path to save login credentials to, optional.
+            language: ISO 639-1 language code for API responses
+        Returns:
+            Zotify session
+        """
+        username = input("Username: ")
+        password = pwinput(prompt="Password: ", mask="*")
+        return Session.from_userpass(username, password, save_file, language)
 
     def __get_playable(
         self, playable_id: PlayableId, quality: Quality
     ) -> PlayableContentFeeder.LoadedStream:
         if quality.value is None:
             quality = Quality.VERY_HIGH if self.is_premium() else Quality.HIGH
-        return self.__session.content_feeder().load(
+        return self.content_feeder().load(
             playable_id,
             VorbisOnlyAudioQuality(quality.value),
             False,
             None,
         )
 
-    def get_track(self, track_id: TrackId, quality: Quality = Quality.AUTO) -> Track:
+    def get_track(self, track_id: str, quality: Quality = Quality.AUTO) -> Track:
         """
         Gets track/episode data and audio stream
         Args:
@@ -159,9 +178,11 @@ class Session:
         Returns:
             Track object
         """
-        return Track(self.__get_playable(track_id, quality), self.api())
+        return Track(
+            self.__get_playable(TrackId.from_base62(track_id), quality), self.api()
+        )
 
-    def get_episode(self, episode_id: EpisodeId) -> Episode:
+    def get_episode(self, episode_id: str) -> Episode:
         """
         Gets track/episode data and audio stream
         Args:
@@ -169,20 +190,19 @@ class Session:
         Returns:
             Episode object
         """
-        return Episode(self.__get_playable(episode_id, Quality.NORMAL), self.api())
+        return Episode(
+            self.__get_playable(EpisodeId.from_base62(episode_id), Quality.NORMAL),
+            self.api(),
+        )
 
-    def api(self) -> ApiClient:
+    def api(self) -> Api:
         """Returns API Client"""
         return self.__api
 
-    def country(self) -> str:
-        """Returns two letter country code of user's account"""
-        return self.__country
+    def language(self) -> str:
+        """Returns session language"""
+        return self.__language
 
     def is_premium(self) -> bool:
         """Returns users premium account status"""
-        return self.__session.get_user_attribute("type") == "premium"
-
-    def clone(self) -> Session:
-        """Creates a copy of the session for use in a parallel thread"""
-        return Session(self.__session, self.__language)
+        return self.get_user_attribute("type") == "premium"

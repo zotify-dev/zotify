@@ -1,13 +1,12 @@
-# STILL IN DEVELOPMENT, NOT RECOMMENDED FOR GENERAL USE!
-
-![Logo banner](https://s1.fileditch.ch/hOwJhfeCFEsYFRWUWaz.png)
+![Logo banner](./assets/banner.png)
 
 # Zotify
 
 A customizable music and podcast downloader. \
 Formerly ZSp‌otify.
 
-Available on [zotify.xyz](https://zotify.xyz/zotify/zotify) and [GitHub](https://github.com/zotify-dev/zotify).
+Available on [zotify.xyz](https://zotify.xyz/zotify/zotify) and [GitHub](https://github.com/zotify-dev/zotify). \
+Built on [Librespot](https://github.com/kokarare1212/librespot-python).
 
 ## Features
 
@@ -48,23 +47,23 @@ Downloads specified items. Accepts any combination of track, album, playlist, ep
 
 <details><summary>All configuration options</summary>
 
-| Config key              | Command line argument     | Description                                         |
-| ----------------------- | ------------------------- | --------------------------------------------------- |
-| path_credentials        | --path-credentials        | Path to credentials file                            |
-| path_archive            | --path-archive            | Path to track archive file                          |
-| music_library           | --music-library           | Path to root of music library                       |
-| podcast_library         | --podcast-library         | Path to root of podcast library                     |
-| mixed_playlist_library  | --mixed-playlist-library  | Path to root of mixed content playlist library      |
-| output_album            | --output-album            | File layout for saved albums                        |
-| output_playlist_track   | --output-playlist-track   | File layout for tracks in a playlist                |
-| output_playlist_episode | --output-playlist-episode | File layout for episodes in a playlist              |
-| output_podcast          | --output-podcast          | File layout for saved podcasts                      |
-| download_quality        | --download-quality        | Audio download quality (auto for highest available) |
-| audio_format            | --audio-format            | Audio format of final track output                  |
-| transcode_bitrate       | --transcode-bitrate       | Transcoding bitrate (-1 to use download rate)       |
-| ffmpeg_path             | --ffmpeg-path             | Path to ffmpeg binary                               |
-| ffmpeg_args             | --ffmpeg-args             | Additional ffmpeg arguments when transcoding        |
-| save_credentials        | --save-credentials        | Save login credentials to a file                    |
+| Config key              | Command line argument     | Description                                         | Default                                                    |
+| ----------------------- | ------------------------- | --------------------------------------------------- | ---------------------------------------------------------- |
+| path_credentials        | --path-credentials        | Path to credentials file                            |                                                            |
+| path_archive            | --path-archive            | Path to track archive file                          |                                                            |
+| music_library           | --music-library           | Path to root of music library                       |                                                            |
+| podcast_library         | --podcast-library         | Path to root of podcast library                     |                                                            |
+| mixed_playlist_library  | --mixed-playlist-library  | Path to root of mixed content playlist library      |                                                            |
+| output_album            | --output-album            | File layout for saved albums                        | {album_artist}/{album}/{track_number}. {artists} - {title} |
+| output_playlist_track   | --output-playlist-track   | File layout for tracks in a playlist                | {playlist}/{playlist_number}. {artists} - {title}          |
+| output_playlist_episode | --output-playlist-episode | File layout for episodes in a playlist              | {playlist}/{playlist_number}. {episode_number} - {title}   |
+| output_podcast          | --output-podcast          | File layout for saved podcasts                      | {podcast}/{episode_number} - {title}                       |
+| download_quality        | --download-quality        | Audio download quality (auto for highest available) |                                                            |
+| audio_format            | --audio-format            | Audio format of final track output                  |                                                            |
+| transcode_bitrate       | --transcode-bitrate       | Transcoding bitrate (-1 to use download rate)       |                                                            |
+| ffmpeg_path             | --ffmpeg-path             | Path to ffmpeg binary                               |                                                            |
+| ffmpeg_args             | --ffmpeg-args             | Additional ffmpeg arguments when transcoding        |                                                            |
+| save_credentials        | --save-credentials        | Save login credentials to a file                    |                                                            |
 | save_subtitles          | --save-subtitles          |
 | save_artist_genres      | --save-arist-genres       |
 
@@ -91,9 +90,9 @@ Zotify can be used as a user-friendly library for saving music, podcasts, lyrics
 Here's a very simple example of downloading a track and its metadata:
 
 ```python
-import zotify
+from zotify import Session
 
-session = zotify.Session.from_userpass(username="username", password="password")
+session = Session.from_userpass(username="username", password="password")
 track = session.get_track("4cOdK2wGLETKBW3PvgPWqT")
 output = track.create_output("./Music", "{artist} - {title}")
 
@@ -113,20 +112,14 @@ All new contributions should follow this principle to keep the program consisten
 
 ## Will my account get banned if I use this tool?
 
-No user has reported their account getting banned after using Zotify
+There have been no confirmed cases of accounts getting banned as a result of using Zotify.
 However, it is still a possiblity and it is recommended you use Zotify with a burner account where possible.
 
-Consider using [Exportify](https://github.com/watsonbox/exportify) to keep backups of your playlists.
+Consider using [Exportify](https://watsonbox.github.io/exportify/) to keep backups of your playlists.
 
 ## Disclaimer
 
 Using Zotify violates Sp‌otify user guidelines and may get your account suspended.
 
-Zotify is intended to be used in compliance with DMCA, Section 1201, for educational, private and fair use, or any simlar laws in other regions. \
-Zotify contributors cannot be held liable for damages caused by the use of this tool. See the [LICENSE](./LICENCE) file for more details.
-
-## Acknowledgements
-
-- [Librespot-Python](https://github.com/kokarare1212/librespot-python) does most of the heavy lifting, it's used for authentication, fetching track data, and audio streaming.
-- [music-tag](https://github.com/KristoforMaynard/music-tag) is used for writing metadata into the downloaded files.
-- [FFmpeg](https://ffmpeg.org/) is used for transcoding audio.
+Zotify is intended to be used in compliance with DMCA, Section 1201, for educational, private and fair use, or any simlar laws in other regions.
+Zotify contributors are not liable for damages caused by the use of this tool. See the [LICENSE](./LICENCE) file for more details.

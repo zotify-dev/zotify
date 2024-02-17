@@ -7,12 +7,8 @@ from sys import stderr
 from typing import Any, NamedTuple
 
 from librespot.audio.decoders import AudioQuality
-from librespot.util import Base62, bytes_to_hex
-from requests import get
+from librespot.util import Base62
 
-API_URL = "https://api.sp" + "otify.com/v1/"
-IMG_URL = "https://i.s" + "cdn.co/image/"
-LYRICS_URL = "https://sp" + "client.wg.sp" + "otify.com/color-lyrics/v2/track/"
 BASE62 = Base62.create_instance_with_inverted_character_set()
 
 
@@ -74,30 +70,47 @@ class ImageSize(IntEnum):
 class MetadataEntry:
     name: str
     value: Any
-    output: str
+    string: str
 
-    def __init__(self, name: str, value: Any, output_value: str | None = None):
+    def __init__(self, name: str, value: Any, string_value: str | None = None):
         """
         Holds metadata entries
         args:
             name: name of metadata key
             value: Value to use in metadata tags
-            output_value: Value when used in output formatting, if none is provided
+            string_value: Value when used in output formatting, if none is provided
             will use value from previous argument.
         """
         self.name = name
 
-        if type(value) == list:
+        if isinstance(value, tuple):
             value = "\0".join(value)
         self.value = value
 
-        if output_value is None:
-            output_value = self.value
-        elif output_value == "":
-            output_value = None
-        if type(output_value) == list:
-            output_value = ", ".join(output_value)
-        self.output = str(output_value)
+        if string_value is None:
+            string_value = self.value
+        if isinstance(string_value, list):
+            string_value = ", ".join(string_value)
+        self.string = str(string_value)
+
+
+class CollectionType(Enum):
+    ALBUM = "album"
+    ARTIST = "artist"
+    SHOW = "show"
+    PLAYLIST = "playlist"
+    TRACK = "track"
+    EPISODE = "episode"
+
+
+class PlayableType(Enum):
+    TRACK = "track"
+    EPISODE = "episode"
+
+
+class PlayableData(NamedTuple):
+    type: PlayableType
+    id: str
 
 
 class SimpleHelpFormatter(HelpFormatter):
@@ -147,7 +160,14 @@ class OptionalOrFalse(Action):
         setattr(
             namespace,
             self.dest,
-            True if not option_string.startswith("--no-") else False,
+            (
+                True
+                if not (
+                    option_string.startswith("--no-")
+                    or option_string.startswith("--dont-")
+                )
+                else False
+            ),
         )
 
 
@@ -172,29 +192,12 @@ def fix_filename(filename: str, substitute: str = "_", platform: str = PLATFORM)
     return sub(regex, substitute, str(filename), flags=IGNORECASE)
 
 
-def download_cover_art(images: list, size: ImageSize) -> bytes:
-    """
-    Returns image data of cover art
-    Args:
-        images: list of retrievable images
-        size: Desired size in pixels of cover art, can be 640, 300, or 64
-    Returns:
-        Image data of cover art
-    """
-    return get(images[size.value]["url"]).content
-
-
-def str_to_bool(value: str) -> bool:
-    if value.lower() in ["yes", "y", "true"]:
-        return True
-    if value.lower() in ["no", "n", "false"]:
-        return False
-    raise TypeError("Not a boolean: " + value)
-
-
 def bytes_to_base62(id: bytes) -> str:
+    """
+    Converts bytes to base62
+    Args:
+        id: bytes
+    Returns:
+        base62
+    """
     return BASE62.encode(id, 22).decode()
-
-
-def b62_to_hex(base62: str) -> str:
-    return bytes_to_hex(BASE62.decode(base62.encode(), 16))

@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+librespot = {git = "git+https://github.com/kokarare1212/librespot-python"}
+music-tag = {git = "git+https://zotify.xyz/zotify/music-tag"}
+mutagen = "*"
+pillow = "*"
+pwinput = "*"
+requests = "*"
+tqdm = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"

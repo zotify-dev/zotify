@@ -10,7 +10,6 @@ from zotify.utils import AudioFormat, ImageSize, Quality
 ALL_ARTISTS = "all_artists"
 ARTWORK_SIZE = "artwork_size"
 AUDIO_FORMAT = "audio_format"
-CHUNK_SIZE = "chunk_size"
 CREATE_PLAYLIST_FILE = "create_playlist_file"
 CREDENTIALS = "credentials"
 DOWNLOAD_QUALITY = "download_quality"
@@ -64,8 +63,8 @@ CONFIG_PATHS = {
 OUTPUT_PATHS = {
     "album": "{album_artist}/{album}/{track_number}. {artists} - {title}",
     "podcast": "{podcast}/{episode_number} - {title}",
-    "playlist_track": "{playlist}/{playlist_number}. {artists} - {title}",
-    "playlist_episode": "{playlist}/{playlist_number}. {episode_number} - {title}",
+    "playlist_track": "{playlist}/{artists} - {title}",
+    "playlist_episode": "{playlist}/{episode_number} - {title}",
 }
 
 CONFIG_VALUES = {
@@ -222,12 +221,6 @@ CONFIG_VALUES = {
         "args": ["--skip-duplicates"],
         "help": "Skip downloading existing track to different album",
     },
-    CHUNK_SIZE: {
-        "default": 16384,
-        "type": int,
-        "args": ["--chunk-size"],
-        "help": "Number of bytes read at a time during download",
-    },
     PRINT_DOWNLOADS: {
         "default": False,
         "type": bool,
@@ -265,7 +258,6 @@ class Config:
     __config_file: Path | None
     artwork_size: ImageSize
     audio_format: AudioFormat
-    chunk_size: int
     credentials: Path
     download_quality: Quality
     ffmpeg_args: str
@@ -274,13 +266,13 @@ class Config:
     language: str
     lyrics_file: bool
     output_album: str
-    output_liked: str
     output_podcast: str
     output_playlist_track: str
     output_playlist_episode: str
     playlist_library: Path
     podcast_library: Path
     print_progress: bool
+    replace_existing: bool
     save_metadata: bool
     transcode_bitrate: int
 
@@ -323,14 +315,14 @@ class Config:
 
         # "library" arg overrides all *_library options
         if args.library:
-            self.music_library = args.library
-            self.playlist_library = args.library
-            self.podcast_library = args.library
+            print("args.library")
+            self.music_library = Path(args.library).expanduser().resolve()
+            self.playlist_library = Path(args.library).expanduser().resolve()
+            self.podcast_library = Path(args.library).expanduser().resolve()
 
         # "output" arg overrides all output_* options
         if args.output:
             self.output_album = args.output
-            self.output_liked = args.output
             self.output_podcast = args.output
             self.output_playlist_track = args.output
             self.output_playlist_episode = args.output
@@ -338,10 +330,10 @@ class Config:
     @staticmethod
     def __parse_arg_value(key: str, value: Any) -> Any:
         config_type = CONFIG_VALUES[key]["type"]
-        if type(value) == config_type:
+        if type(value) is config_type:
             return value
         elif config_type == Path:
-            return Path(value).expanduser()
+            return Path(value).expanduser().resolve()
         elif config_type == AudioFormat:
             return AudioFormat[value.upper()]
         elif config_type == ImageSize.from_string:

@@ -8,8 +8,7 @@ from mutagen.oggvorbis import OggVorbisHeaderError
 from zotify.utils import AudioFormat, MetadataEntry
 
 
-class TranscodingError(RuntimeError):
-    ...
+class TranscodingError(RuntimeError): ...
 
 
 class LocalFile:

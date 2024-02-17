@@ -2,8 +2,6 @@
 
 ## v1.0.0
 
-An unexpected reboot.
-
 ### BREAKING CHANGES AHEAD
 
 - Most components have been completely rewritten to address some fundamental design issues with the previous codebase, This update will provide a better base for new features in the future.
@@ -12,7 +10,7 @@ An unexpected reboot.
 
 ### Changes
 
-- Genre metadata available for tracks downloaded from an album
+- Genre metadata available for all tracks
 - Boolean command line options are now set like `--save-metadata` or `--no-save-metadata` for True or False
 - Setting `--config` (formerly `--config-location`) can be set to "None" to not use any config file
 - Search result selector now accepts both comma-seperated and hyphen-seperated values at the same time
@@ -24,10 +22,12 @@ An unexpected reboot.
 - The output template used is now based on track info rather than search result category
 - Search queries with spaces no longer need to be in quotes
 - File metadata no longer uses sanitized file metadata, this will result in more accurate metadata.
-- Replaced ffmpy with custom implementation
+- Replaced ffmpy with custom implementation providing more tags
+- Fixed artist download missing some tracks
 
 ### Additions
 
+- New library location for playlists `playlist_library`
 - Added new command line arguments
   - `--library`/`-l` overrides both `music_library` and `podcast_library` options similar to `--output`/`-o`
   - `--category`/`-c` will limit search results to a certain type, accepted values are "album", "artist", "playlist", "track", "show", "episode". Accepts multiple choices.
@@ -52,13 +52,13 @@ An unexpected reboot.
   - `{album_artist}`
   - `{album_artists}`
   - `{duration}` (milliseconds)
+  - `{explicit}`
   - `{isrc}`
   - `{licensor}`
   - `{popularity}`
   - `{release_date}`
   - `{track_number}`
 - Genre information is now more accurate and is always enabled
-- New library location for playlists `playlist_library`
 - Added download option for "liked episodes" `--liked-episodes`/`-le`
 - Added `save_metadata` option to fully disable writing track metadata
 - Added support for ReplayGain
@@ -79,6 +79,7 @@ An unexpected reboot.
 - Removed `print_api_errors` because API errors are now treated like regular errors
 - Removed the following config options due to their corresponding features being removed:
   - `bulk_wait_time`
+  - `chunk_size`
   - `download_real_time`
   - `md_allgenres`
   - `md_genredelimiter`

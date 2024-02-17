@@ -13,7 +13,7 @@ from zotify.config import (
 )
 
 
-class PrintChannel(Enum):
+class LogChannel(Enum):
     SKIPS = PRINT_SKIPS
     PROGRESS = PRINT_PROGRESS
     ERRORS = PRINT_ERRORS
@@ -21,7 +21,7 @@ class PrintChannel(Enum):
     DOWNLOADS = PRINT_DOWNLOADS
 
 
-class Printer:
+class Logger:
     __config: Config
 
     @classmethod
@@ -29,15 +29,15 @@ class Printer:
         cls.__config = config
 
     @classmethod
-    def print(cls, channel: PrintChannel, msg: str) -> None:
+    def log(cls, channel: LogChannel, msg: str) -> None:
         """
         Prints a message to console if the print channel is enabled
         Args:
-            channel: PrintChannel to print to
-            msg: Message to print
+            channel: LogChannel to print to
+            msg: Message to log
         """
         if cls.__config.get(channel.value):
-            if channel == PrintChannel.ERRORS:
+            if channel == LogChannel.ERRORS:
                 print(msg, file=stderr)
             else:
                 print(msg)
@@ -76,7 +76,7 @@ class Printer:
         """
         Prints animated loading symbol
         Args:
-            msg: Message to print
+            msg: Message to display
         """
         if cls.__config.print_progress:
             print(msg, flush=True, end="")

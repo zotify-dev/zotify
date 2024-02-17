@@ -3,37 +3,40 @@ from pathlib import Path
 from typing import Any
 
 from librespot.core import PlayableContentFeeder
+from librespot.metadata import AlbumId
 from librespot.structure import GeneralAudioStream
 from librespot.util import bytes_to_hex
 from requests import get
 
 from zotify.file import LocalFile
-from zotify.printer import Printer
+from zotify.logger import Logger
 from zotify.utils import (
-    IMG_URL,
-    LYRICS_URL,
     AudioFormat,
     ImageSize,
     MetadataEntry,
+    PlayableType,
     bytes_to_base62,
     fix_filename,
 )
 
+IMG_URL = "https://i.s" + "cdn.co/image/"
+LYRICS_URL = "https://sp" + "client.wg.sp" + "otify.com/color-lyrics/v2/track/"
+
 
 class Lyrics:
     def __init__(self, lyrics: dict, **kwargs):
-        self.lines = []
-        self.sync_type = lyrics["syncType"]
+        self.__lines = []
+        self.__sync_type = lyrics["syncType"]
         for line in lyrics["lines"]:
-            self.lines.append(line["words"] + "\n")
-        if self.sync_type == "line_synced":
-            self.lines_synced = []
+            self.__lines.append(line["words"] + "\n")
+        if self.__sync_type == "line_synced":
+            self.__lines_synced = []
             for line in lyrics["lines"]:
                 timestamp = int(line["start_time_ms"])
                 ts_minutes = str(floor(timestamp / 60000)).zfill(2)
                 ts_seconds = str(floor((timestamp % 60000) / 1000)).zfill(2)
                 ts_millis = str(floor(timestamp % 1000))[:2].zfill(2)
-                self.lines_synced.append(
+                self.__lines_synced.append(
                     f"[{ts_minutes}:{ts_seconds}.{ts_millis}]{line.words}\n"
                 )
 
@@ -44,21 +47,24 @@ class Lyrics:
             location: path to target lyrics file
             prefer_synced: Use line synced lyrics if available
         """
-        if self.sync_type == "line_synced" and prefer_synced:
+        if self.__sync_type == "line_synced" and prefer_synced:
             with open(f"{path}.lrc", "w+", encoding="utf-8") as f:
-                f.writelines(self.lines_synced)
+                f.writelines(self.__lines_synced)
         else:
             with open(f"{path}.txt", "w+", encoding="utf-8") as f:
-                f.writelines(self.lines[:-1])
+                f.writelines(self.__lines[:-1])
 
 
 class Playable:
     cover_images: list[Any]
+    input_stream: GeneralAudioStream
     metadata: list[MetadataEntry]
     name: str
-    input_stream: GeneralAudioStream
+    type: PlayableType
 
-    def create_output(self, library: Path, output: str, replace: bool = False) -> Path:
+    def create_output(
+        self, library: Path = Path("./"), output: str = "{title}", replace: bool = False
+    ) -> Path:
         """
         Creates save directory for the output file
         Args:
@@ -68,9 +74,11 @@ class Playable:
         Returns:
             File path for the track
         """
-        for m in self.metadata:
-            if m.output is not None:
-                output = output.replace("{" + m.name + "}", fix_filename(m.output))
+        for meta in self.metadata:
+            if meta.string is not None:
+                output = output.replace(
+                    "{" + meta.name + "}", fix_filename(meta.string)
+                )
         file_path = library.joinpath(output).expanduser()
         if file_path.exists() and not replace:
             raise FileExistsError("File already downloaded")
@@ -81,18 +89,16 @@ class Playable:
     def write_audio_stream(
         self,
         output: Path,
-        chunk_size: int = 128 * 1024,
     ) -> LocalFile:
         """
         Writes audio stream to file
         Args:
             output: File path of saved audio stream
-            chunk_size: maximum number of bytes to read at a time
         Returns:
             LocalFile object
         """
         file = f"{output}.ogg"
-        with open(file, "wb") as f, Printer.progress(
+        with open(file, "wb") as f, Logger.progress(
             desc=self.name,
             total=self.input_stream.size,
             unit="B",
@@ -103,7 +109,7 @@ class Playable:
         ) as p_bar:
             chunk = None
             while chunk != b"":
-                chunk = self.input_stream.stream().read(chunk_size)
+                chunk = self.input_stream.stream().read(1024)
                 p_bar.update(f.write(chunk))
         return LocalFile(Path(file), AudioFormat.VORBIS)
 
@@ -121,8 +127,6 @@ class Playable:
 
 
 class Track(PlayableContentFeeder.LoadedStream, Playable):
-    lyrics: Lyrics
-
     def __init__(self, track: PlayableContentFeeder.LoadedStream, api):
         super(Track, self).__init__(
             track.track,
@@ -131,8 +135,10 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             track.metrics,
         )
         self.__api = api
+        self.__lyrics: Lyrics
         self.cover_images = self.album.cover_group.image
         self.metadata = self.__default_metadata()
+        self.type = PlayableType.TRACK
 
     def __getattr__(self, name):
         try:
@@ -142,6 +148,10 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
 
     def __default_metadata(self) -> list[MetadataEntry]:
         date = self.album.date
+        if not hasattr(self.album, "genre"):
+            self.track.album = self.__api().get_metadata_4_album(
+                AlbumId.from_hex(bytes_to_hex(self.album.gid))
+            )
         return [
             MetadataEntry("album", self.album.name),
             MetadataEntry("album_artist", [a.name for a in self.album.artist]),
@@ -155,6 +165,7 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             MetadataEntry("popularity", int(self.popularity * 255) / 100),
             MetadataEntry("track_number", self.number, str(self.number).zfill(2)),
             MetadataEntry("title", self.name),
+            MetadataEntry("year", date.year),
             MetadataEntry(
                 "replaygain_track_gain", self.normalization_data.track_gain_db, ""
             ),
@@ -169,21 +180,21 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             ),
         ]
 
-    def get_lyrics(self) -> Lyrics:
+    def lyrics(self) -> Lyrics:
         """Returns track lyrics if available"""
         if not self.track.has_lyrics:
             raise FileNotFoundError(
                 f"No lyrics available for {self.track.artist[0].name} - {self.track.name}"
             )
         try:
-            return self.lyrics
+            return self.__lyrics
         except AttributeError:
-            self.lyrics = Lyrics(
+            self.__lyrics = Lyrics(
                 self.__api.invoke_url(LYRICS_URL + bytes_to_base62(self.track.gid))[
                     "lyrics"
                 ]
             )
-            return self.lyrics
+            return self.__lyrics
 
 
 class Episode(PlayableContentFeeder.LoadedStream, Playable):
@@ -197,6 +208,7 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
         self.__api = api
         self.cover_images = self.episode.cover_image.image
         self.metadata = self.__default_metadata()
+        self.type = PlayableType.EPISODE
 
     def __getattr__(self, name):
         try:
@@ -216,23 +228,21 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
             MetadataEntry("title", self.name),
         ]
 
-    def write_audio_stream(
-        self, output: Path, chunk_size: int = 128 * 1024
-    ) -> LocalFile:
+    def write_audio_stream(self, output: Path) -> LocalFile:
         """
-        Writes audio stream to file
+        Writes audio stream to file.
+        Uses external source if available for faster download.
         Args:
             output: File path of saved audio stream
-            chunk_size: maximum number of bytes to read at a time
         Returns:
             LocalFile object
         """
         if not bool(self.external_url):
-            return super().write_audio_stream(output, chunk_size)
+            return super().write_audio_stream(output)
         file = f"{output}.{self.external_url.rsplit('.', 1)[-1]}"
         with get(self.external_url, stream=True) as r, open(
             file, "wb"
-        ) as f, Printer.progress(
+        ) as f, Logger.progress(
             desc=self.name,
             total=self.input_stream.size,
             unit="B",
@@ -241,6 +251,6 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
             position=0,
             leave=False,
         ) as p_bar:
-            for chunk in r.iter_content(chunk_size=chunk_size):
+            for chunk in r.iter_content(chunk_size=1024):
                 p_bar.update(f.write(chunk))
         return LocalFile(Path(file))

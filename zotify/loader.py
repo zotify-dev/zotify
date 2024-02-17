@@ -8,7 +8,7 @@ from sys import platform
 from threading import Thread
 from time import sleep
 
-from zotify.printer import Printer
+from zotify.logger import Logger
 
 
 class Loader:
@@ -50,7 +50,7 @@ class Loader:
         for c in cycle(self.steps):
             if self.done:
                 break
-            Printer.print_loader(f"\r {c} {self.desc} ")
+            Logger.print_loader(f"\r {c} {self.desc} ")
             sleep(self.timeout)
 
     def __enter__(self) -> None:
@@ -59,10 +59,10 @@ class Loader:
     def stop(self) -> None:
         self.done = True
         cols = get_terminal_size((80, 20)).columns
-        Printer.print_loader("\r" + " " * cols)
+        Logger.print_loader("\r" + " " * cols)
 
         if self.end != "":
-            Printer.print_loader(f"\r{self.end}")
+            Logger.print_loader(f"\r{self.end}")
 
     def __exit__(self, exc_type, exc_value, tb) -> None:
         # handle exceptions with those variables ^
