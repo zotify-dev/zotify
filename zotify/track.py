@@ -189,12 +189,17 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
         # a song with the same name is installed
         if not check_id and check_name:
-            c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
+            
+            if Zotify.CONFIG.get_skip_existing():
+                Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
+                return
+            else:
+                c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
 
-            fname = PurePath(PurePath(filename).name).parent
-            ext = PurePath(PurePath(filename).name).suffix
+                fname = PurePath(filename).stem
+                ext = PurePath(PurePath(filename).name).suffix
 
-            filename = PurePath(filedir).joinpath(f'{fname}_{c}{ext}')
+                filename = PurePath(filedir).joinpath(f'{fname}_{c}{ext}')
 
     except Exception as e:
         Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
@@ -284,6 +289,22 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
                     if Zotify.CONFIG.get_bulk_wait_time():
                         time.sleep(Zotify.CONFIG.get_bulk_wait_time())
+
+                # Verifica se o nome da playlist foi fornecido
+                if extra_keys and 'playlist' in extra_keys:
+                    playlist_file = PurePath(Zotify.CONFIG.get_root_path()).joinpath(extra_keys['playlist'] + '.m3u8')
+                
+                    # Se for o primeiro item da playlist, realiza o truncamento
+                    if extra_keys['playlist_num'].lstrip('0') == '1':
+                        with open(playlist_file, 'w', encoding='utf-8') as f:
+                            f.write("#EXTM3U\n")
+                
+                    # Adiciona o nome do arquivo da mÃºsica baixada Ã  playlist M3U8
+                    with open(playlist_file, "a", encoding='utf-8') as f:
+                        #f.write("#EXTINF:-1," + urlencode(song_name) + "\n")
+                        #f.write(f"{filename}\n")
+                        f.write(f"{filename.relative_to(PurePath(Zotify.CONFIG.get_root_path()))}\n")
+
         except Exception as e:
             Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
             Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
