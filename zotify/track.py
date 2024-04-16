@@ -192,8 +192,8 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
         if not check_id and check_name:
             
             if Zotify.CONFIG.get_skip_existing():
+                prepare_download_loader.stop()
                 Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
-                return
             else:
                 c = len([file for file in Path(filedir).iterdir() if re.search(f'^{filename}_', str(file))]) + 1
 
