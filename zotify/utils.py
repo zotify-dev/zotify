@@ -165,35 +165,35 @@ def regex_input_for_urls(search_input) -> Tuple[str, str, str, str, str, str]:
     album_uri_search = re.search(
         r'^spotify:album:(?P<AlbumID>[0-9a-zA-Z]{22})$', search_input)
     album_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com(?:/intl-\w\w)?/album/(?P<AlbumID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/album/(?P<AlbumID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     playlist_uri_search = re.search(
         r'^spotify:playlist:(?P<PlaylistID>[0-9a-zA-Z]{22})$', search_input)
     playlist_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com(?:/intl-\w\w)?/playlist/(?P<PlaylistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/playlist/(?P<PlaylistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     episode_uri_search = re.search(
         r'^spotify:episode:(?P<EpisodeID>[0-9a-zA-Z]{22})$', search_input)
     episode_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com(?:/intl-\w\w)?/episode/(?P<EpisodeID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/episode/(?P<EpisodeID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     show_uri_search = re.search(
         r'^spotify:show:(?P<ShowID>[0-9a-zA-Z]{22})$', search_input)
     show_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com(?:/intl-\w\w)?/show/(?P<ShowID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/show/(?P<ShowID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     artist_uri_search = re.search(
         r'^spotify:artist:(?P<ArtistID>[0-9a-zA-Z]{22})$', search_input)
     artist_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com(?:/intl-\w\w)?/artist/(?P<ArtistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/artist/(?P<ArtistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
