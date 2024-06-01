@@ -49,7 +49,7 @@ def get_playlist_info(playlist_id):
 def download_playlist(playlist):
     """Downloads all the songs from a playlist"""
 
-    playlist_songs = [song for song in get_playlist_songs(playlist[ID]) if song[TRACK][ID]]
+    playlist_songs = [song for song in get_playlist_songs(playlist[ID]) if song[TRACK] is not None and song[TRACK][ID]]
     p_bar = Printer.progress(playlist_songs, unit='song', total=len(playlist_songs), unit_scale=True)
     enum = 1
     for song in p_bar:
