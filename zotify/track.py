@@ -304,21 +304,31 @@ def convert_audio_format(filename) -> None:
     download_format = Zotify.CONFIG.get_download_format().lower()
     file_codec = CODEC_MAP.get(download_format, 'copy')
     if file_codec != 'copy':
-        bitrate = Zotify.CONFIG.get_transcode_bitrate()
         bitrates = {
             'auto': '320k' if Zotify.check_premium() else '160k',
             'normal': '96k',
             'high': '160k',
             'very_high': '320k'
         }
-        bitrate = bitrates[Zotify.CONFIG.get_download_quality()]
+        
+        # This var does the job of the old 'bitrate' var.
+        predef_quality_level_bitrate = bitrates[Zotify.CONFIG.get_download_quality()]
+        # New var to hold user-specified bitrate separately
+        custom_bitrate = Zotify.CONFIG.get_transcode_bitrate()
+        
+        # Check if the user has specified a custom bitrate, ie they've put something in for transcode bitrate, take that and use it as the bitrate. It's more important than the predefined quality levels
+        if custom_bitrate != None:
+            set_bitrate = custom_bitrate
+        else:
+            set_bitrate = predef_quality_level_bitrate
+        
     else:
-        bitrate = None
+        set_bitrate = None
 
     output_params = ['-c:a', file_codec]
-    if bitrate:
-        output_params += ['-b:a', bitrate]
-
+    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloading in {file_codec.upper()}   ###')
+    if set_bitrate:
+        output_params += ['-b:a', set_bitrate]
     try:
         ff_m = ffmpy.FFmpeg(
             global_options=['-y', '-hide_banner', '-loglevel error'],
