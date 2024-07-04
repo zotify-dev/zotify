@@ -11,7 +11,7 @@ from typing import List, Tuple
 import music_tag
 import requests
 
-from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, ARTWORK, \
+from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, TOTALTRACKS, ARTWORK, \
     WINDOWS_SYSTEM, LINUX_SYSTEM, ALBUMARTIST
 from zotify.zotify import Zotify
 
@@ -126,7 +126,7 @@ def clear() -> None:
         os.system('clear')
 
 
-def set_audio_tags(filename, artists, genres, name, album_name, release_year, disc_number, track_number) -> None:
+def set_audio_tags(filename, artists, genres, name, album_name, release_year, disc_number, track_number, total_tracks) -> None:
     """ sets music_tag metadata """
     tags = music_tag.load_file(filename)
     tags[ALBUMARTIST] = artists[0]
@@ -137,6 +137,7 @@ def set_audio_tags(filename, artists, genres, name, album_name, release_year, di
     tags[YEAR] = release_year
     tags[DISCNUMBER] = disc_number
     tags[TRACKNUMBER] = track_number
+    tags[TOTALTRACKS] = total_tracks
     tags.save()
 
 

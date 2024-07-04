@@ -8,6 +8,8 @@ TRACK_STATS_URL = 'https://api.spotify.com/v1/audio-features/'
 
 TRACKNUMBER = 'tracknumber'
 
+TOTALTRACKS = 'totaltracks'
+
 DISCNUMBER = 'discnumber'
 
 YEAR = 'year'
@@ -57,6 +59,8 @@ IS_PLAYABLE = 'is_playable'
 DURATION_MS = 'duration_ms'
 
 TRACK_NUMBER = 'track_number'
+
+TOTAL_TRACKS = 'total_tracks'
 
 DISC_NUMBER = 'disc_number'
 
