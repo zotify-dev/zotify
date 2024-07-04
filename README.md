@@ -1,22 +1,3 @@
-### hollis notes!
-
-getting into debug:
-
-```
-python3 -m venv ./
-
-# for windows:
-./Scripts/Activate.ps1
-# for linux:
-source ./bin/activate
-
-python3 -m pip install -r requirements.txt
-
-python3 -m zotify
-```
-
----
-
 # Zotify
 
 ### A highly customizable music and podcast downloader.
