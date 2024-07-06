@@ -28,6 +28,7 @@ PRINT_ERRORS = 'PRINT_ERRORS'
 PRINT_DOWNLOADS = 'PRINT_DOWNLOADS'
 PRINT_API_ERRORS = 'PRINT_API_ERRORS'
 TEMP_DOWNLOAD_DIR = 'TEMP_DOWNLOAD_DIR'
+MD_ARTISTDELIMITER = 'MD_ARTISTDELIMITER'
 MD_SAVE_GENRES = 'MD_SAVE_GENRES'
 MD_ALLGENRES = 'MD_ALLGENRES'
 MD_GENREDELIMITER = 'MD_GENREDELIMITER'
@@ -48,9 +49,10 @@ CONFIG_VALUES = {
     MAX_FILENAME_LENGTH:        { 'default': '255',   'type': int,  'arg': '--max-filename-length'        },
     SPLIT_ALBUM_DISCS:          { 'default': 'False', 'type': bool, 'arg': '--split-album-discs'          },
     DOWNLOAD_LYRICS:            { 'default': 'True',  'type': bool, 'arg': '--download-lyrics'            },
+    MD_ARTISTDELIMITER:         { 'default': ', ',    'type': str,  'arg': '--md-artistdelimiter'         },
     MD_SAVE_GENRES:             { 'default': 'False', 'type': bool, 'arg': '--md-save-genres'             },
     MD_ALLGENRES:               { 'default': 'False', 'type': bool, 'arg': '--md-allgenres'               },
-    MD_GENREDELIMITER:          { 'default': ',',     'type': str,  'arg': '--md-genredelimiter'          },
+    MD_GENREDELIMITER:          { 'default': ', ',    'type': str,  'arg': '--md-genredelimiter'          },
     DOWNLOAD_FORMAT:            { 'default': 'ogg',   'type': str,  'arg': '--download-format'            },
     DOWNLOAD_QUALITY:           { 'default': 'auto',  'type': str,  'arg': '--download-quality'           },
     TRANSCODE_BITRATE:          { 'default': 'auto',  'type': str,  'arg': '--transcode-bitrate'          },
@@ -263,6 +265,10 @@ class Config:
             return ''
         return PurePath(cls.get_root_path()).joinpath(cls.get(TEMP_DOWNLOAD_DIR))
 
+    @classmethod
+    def get_artist_delimiter(cls) -> bool:
+        return cls.get(MD_ARTISTDELIMITER)
+    
     @classmethod
     def get_save_genres(cls) -> bool:
         return cls.get(MD_SAVE_GENRES)

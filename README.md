@@ -66,8 +66,9 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | MAX_FILENAME_LENGTH          | --max-filename-length            | 255      | Maximum filename length
 | SPLIT_ALBUM_DISCS            | --split-album-discs              | False    | Saves each disk in its own folder
 | DOWNLOAD_LYRICS              | --download-lyrics                | True     | Downloads synced lyrics in .lrc format, uses unsynced as fallback.
+| MD_ARTISTDELIMITER           | --md-artistdelimiter             | ', '     | Delimiter character used to split artists in metadata
 | MD_ALLGENRES                 | --md-allgenres                   | False    | Save all relevant genres in metadata
-| MD_GENREDELIMITER            | --md-genredelimiter              | ,        | Delimiter character used to split genres in metadata
+| MD_GENREDELIMITER            | --md-genredelimiter              | ', '     | Delimiter character used to split genres in metadata
 | DOWNLOAD_FORMAT              | --download-format                | ogg      | The download audio format (aac, fdk_aac, m4a, mp3, ogg, opus, vorbis)
 | DOWNLOAD_QUALITY             | --download-quality               | auto     | Audio quality of downloaded songs (normal, high, very_high*)
 | TRANSCODE_BITRATE            | --transcode-bitrate              | auto     | Overwrite the bitrate for ffmpeg encoding
