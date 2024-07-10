@@ -36,6 +36,7 @@ PRINT_WARNINGS = 'PRINT_WARNINGS'
 RETRY_ATTEMPTS = 'RETRY_ATTEMPTS'
 CONFIG_VERSION = 'CONFIG_VERSION'
 DOWNLOAD_LYRICS = 'DOWNLOAD_LYRICS'
+MAX_FILENAME_LENGTH = 'MAX_FILENAME_LENGTH'
 
 CONFIG_VALUES = {
     SAVE_CREDENTIALS:           { 'default': 'True',  'type': bool, 'arg': '--save-credentials'           },
@@ -44,6 +45,7 @@ CONFIG_VALUES = {
     SONG_ARCHIVE:               { 'default': '',      'type': str,  'arg': '--song-archive'               },
     ROOT_PATH:                  { 'default': '',      'type': str,  'arg': '--root-path'                  },
     ROOT_PODCAST_PATH:          { 'default': '',      'type': str,  'arg': '--root-podcast-path'          },
+    MAX_FILENAME_LENGTH:        { 'default': '255',   'type': int,  'arg': '--max-filename-length'        },
     SPLIT_ALBUM_DISCS:          { 'default': 'False', 'type': bool, 'arg': '--split-album-discs'          },
     DOWNLOAD_LYRICS:            { 'default': 'True',  'type': bool, 'arg': '--download-lyrics'            },
     MD_SAVE_GENRES:             { 'default': 'False', 'type': bool, 'arg': '--md-save-genres'             },
@@ -308,3 +310,7 @@ class Config:
     @classmethod
     def get_retry_attempts(cls) -> int:
         return cls.get(RETRY_ATTEMPTS)
+    
+    @classmethod
+    def get_max_filename_length(cls) -> int:
+        return cls.get(MAX_FILENAME_LENGTH)
