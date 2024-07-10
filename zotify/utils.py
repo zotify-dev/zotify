@@ -244,7 +244,7 @@ def regex_input_for_urls(search_input) -> Tuple[str, str, str, str, str, str]:
 
 def fix_filename(name):
     """
-    Replace invalid characters on Linux/Windows/MacOS with underscores and truncate if too long.
+    Replace invalid characters on Linux/Windows/MacOS with underscores.
     List from https://stackoverflow.com/a/31976060/819417
     Trailing spaces & periods are ignored on Windows.
     >>> fix_filename("  COM1  ")
