@@ -4,5 +4,5 @@ music_tag
 Pillow
 protobuf
 pwinput
-tabulate
+tabulate[widechars]
 tqdm
