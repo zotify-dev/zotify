@@ -244,7 +244,7 @@ def regex_input_for_urls(search_input) -> Tuple[str, str, str, str, str, str]:
 
 def fix_filename(name):
     """
-    Replace invalid characters on Linux/Windows/MacOS with underscores.
+    Replace invalid characters on Linux/Windows/MacOS with underscores and truncate if too long.
     List from https://stackoverflow.com/a/31976060/819417
     Trailing spaces & periods are ignored on Windows.
     >>> fix_filename("  COM1  ")
@@ -259,11 +259,18 @@ def fix_filename(name):
     True
     """
     if platform.system() == WINDOWS_SYSTEM:
-        return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
+        name = re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
     elif platform.system() == LINUX_SYSTEM:
-        return re.sub(r'[/\0]', "_", str(name))
+        name = re.sub(r'[/\0]', "_", str(name))
     else: # MacOS
-        return re.sub(r'[/:\0]', "_", str(name))
+        name = re.sub(r'[/:\0]', "_", str(name))
+
+    max_filename_length = Zotify.CONFIG.get_max_filename_length()
+    
+    if len(name) > max_filename_length:
+        name = name[:max_filename_length]
+
+    return name
 
 
 def fmt_seconds(secs: float) -> str:
