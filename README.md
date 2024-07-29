@@ -63,6 +63,7 @@ Be aware you have to set boolean values in the commandline like this: `--downloa
 | SONG_ARCHIVE                 | --song-archive                   |          | The song_archive file for SKIP_PREVIOUSLY_DOWNLOADED
 | ROOT_PATH                    | --root-path                      |          | Directory where Zotify saves music
 | ROOT_PODCAST_PATH            | --root-podcast-path              |          | Directory where Zotify saves podcasts
+| MAX_FILENAME_LENGTH          | --max-filename-length            | 255      | Maximum filename length
 | SPLIT_ALBUM_DISCS            | --split-album-discs              | False    | Saves each disk in its own folder
 | DOWNLOAD_LYRICS              | --download-lyrics                | True     | Downloads synced lyrics in .lrc format, uses unsynced as fallback.
 | MD_ALLGENRES                 | --md-allgenres                   | False    | Save all relevant genres in metadata
