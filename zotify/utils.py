@@ -142,7 +142,7 @@ def set_audio_tags(filename, artists, genres, name, album_name, release_year, di
 
 def conv_artist_format(artists) -> str:
     """ Returns converted artist format """
-    return ', '.join(artists)
+    return Zotify.CONFIG.get_artist_delimiter().join(artists)
 
 
 def set_music_thumbnail(filename, image_url) -> None:
