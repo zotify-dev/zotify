@@ -11,7 +11,7 @@ from typing import List, Tuple
 import music_tag
 import requests
 
-from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, ARTWORK, \
+from zotify.const import ARTIST, GENRE, TRACKTITLE, ALBUM, YEAR, DISCNUMBER, TRACKNUMBER, TOTALTRACKS, ARTWORK, \
     WINDOWS_SYSTEM, LINUX_SYSTEM, ALBUMARTIST
 from zotify.zotify import Zotify
 
@@ -126,7 +126,7 @@ def clear() -> None:
         os.system('clear')
 
 
-def set_audio_tags(filename, artists, genres, name, album_name, release_year, disc_number, track_number) -> None:
+def set_audio_tags(filename, artists, genres, name, album_name, release_year, disc_number, track_number, total_tracks) -> None:
     """ sets music_tag metadata """
     tags = music_tag.load_file(filename)
     tags[ALBUMARTIST] = artists[0]
@@ -137,12 +137,13 @@ def set_audio_tags(filename, artists, genres, name, album_name, release_year, di
     tags[YEAR] = release_year
     tags[DISCNUMBER] = disc_number
     tags[TRACKNUMBER] = track_number
+    tags[TOTALTRACKS] = total_tracks
     tags.save()
 
 
 def conv_artist_format(artists) -> str:
     """ Returns converted artist format """
-    return ', '.join(artists)
+    return Zotify.CONFIG.get_artist_delimiter().join(artists)
 
 
 def set_music_thumbnail(filename, image_url) -> None:
@@ -158,42 +159,42 @@ def regex_input_for_urls(search_input) -> Tuple[str, str, str, str, str, str]:
     track_uri_search = re.search(
         r'^spotify:track:(?P<TrackID>[0-9a-zA-Z]{22})$', search_input)
     track_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/track/(?P<TrackID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/track/(?P<TrackID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     album_uri_search = re.search(
         r'^spotify:album:(?P<AlbumID>[0-9a-zA-Z]{22})$', search_input)
     album_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/album/(?P<AlbumID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/album/(?P<AlbumID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     playlist_uri_search = re.search(
         r'^spotify:playlist:(?P<PlaylistID>[0-9a-zA-Z]{22})$', search_input)
     playlist_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/playlist/(?P<PlaylistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/playlist/(?P<PlaylistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     episode_uri_search = re.search(
         r'^spotify:episode:(?P<EpisodeID>[0-9a-zA-Z]{22})$', search_input)
     episode_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/episode/(?P<EpisodeID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/episode/(?P<EpisodeID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     show_uri_search = re.search(
         r'^spotify:show:(?P<ShowID>[0-9a-zA-Z]{22})$', search_input)
     show_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/show/(?P<ShowID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/show/(?P<ShowID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
     artist_uri_search = re.search(
         r'^spotify:artist:(?P<ArtistID>[0-9a-zA-Z]{22})$', search_input)
     artist_url_search = re.search(
-        r'^(https?://)?open\.spotify\.com/artist/(?P<ArtistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
+        r'^(https?://)?open\.spotify\.com(?:/intl-\w+)?/artist/(?P<ArtistID>[0-9a-zA-Z]{22})(\?si=.+?)?$',
         search_input,
     )
 
@@ -259,11 +260,18 @@ def fix_filename(name):
     True
     """
     if platform.system() == WINDOWS_SYSTEM:
-        return re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
+        name = re.sub(r'[/\\:|<>"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$', "_", str(name), flags=re.IGNORECASE)
     elif platform.system() == LINUX_SYSTEM:
-        return re.sub(r'[/\0]', "_", str(name))
+        name = re.sub(r'[/\0]', "_", str(name))
     else: # MacOS
-        return re.sub(r'[/:\0]', "_", str(name))
+        name = re.sub(r'[/:\0]', "_", str(name))
+
+    max_filename_length = Zotify.CONFIG.get_max_filename_length()
+    
+    if len(name) > max_filename_length:
+        name = name[:max_filename_length]
+
+    return name
 
 
 def fmt_seconds(secs: float) -> str:
@@ -287,3 +295,7 @@ def fmt_seconds(secs: float) -> str:
         return f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
     else:
         return f'{h}'.zfill(2) + ':' + f'{m}'.zfill(2) + ':' + f'{s}'.zfill(2)
+
+def strptime_utc(dtstr):
+    return datetime.datetime.strptime(dtstr[:-1], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc)
+
