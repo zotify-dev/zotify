@@ -22,7 +22,7 @@ class LogChannel(Enum):
 
 
 class Logger:
-    __config: Config
+    __config: Config = Config()
 
     @classmethod
     def __init__(cls, config: Config):
@@ -50,9 +50,9 @@ class Logger:
         total=None,
         leave=False,
         position=0,
-        unit="it",
-        unit_scale=False,
-        unit_divisor=1000,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
     ) -> tqdm:
         """
         Prints progress bar

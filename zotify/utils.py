@@ -1,9 +1,7 @@
-from argparse import Action, ArgumentError, HelpFormatter
+from argparse import Action, ArgumentError
 from enum import Enum, IntEnum
+from pathlib import Path
 from re import IGNORECASE, sub
-from sys import exit
-from sys import platform as PLATFORM
-from sys import stderr
 from typing import Any, NamedTuple
 
 from librespot.audio.decoders import AudioQuality
@@ -25,7 +23,20 @@ class AudioFormat(Enum):
     OPUS = AudioCodec("opus", "ogg")
     VORBIS = AudioCodec("vorbis", "ogg")
     WAV = AudioCodec("wav", "wav")
-    WV = AudioCodec("wavpack", "wv")
+    WAVPACK = AudioCodec("wavpack", "wv")
+
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
+
+    @staticmethod
+    def from_string(s):
+        try:
+            return AudioFormat[s.upper()]
+        except Exception:
+            return s
 
 
 class Quality(Enum):
@@ -94,15 +105,6 @@ class MetadataEntry:
         self.string = str(string_value)
 
 
-class CollectionType(Enum):
-    ALBUM = "album"
-    ARTIST = "artist"
-    SHOW = "show"
-    PLAYLIST = "playlist"
-    TRACK = "track"
-    EPISODE = "episode"
-
-
 class PlayableType(Enum):
     TRACK = "track"
     EPISODE = "episode"
@@ -111,14 +113,9 @@ class PlayableType(Enum):
 class PlayableData(NamedTuple):
     type: PlayableType
     id: str
-
-
-class SimpleHelpFormatter(HelpFormatter):
-    def _format_usage(self, usage, actions, groups, prefix):
-        if usage is not None:
-            super()._format_usage(usage, actions, groups, prefix)
-        stderr.write('zotify: error: unrecognized arguments - try "zotify -h"\n')
-        exit(2)
+    library: Path
+    output_template: str
+    metadata: list[MetadataEntry] = []
 
 
 class OptionalOrFalse(Action):
@@ -171,24 +168,22 @@ class OptionalOrFalse(Action):
         )
 
 
-def fix_filename(filename: str, substitute: str = "_", platform: str = PLATFORM) -> str:
+def fix_filename(
+    filename: str,
+    substitute: str = "_",
+) -> str:
     """
-    Replace invalid characters on Linux/Windows/MacOS with underscores.
+    Replace invalid characters. Trailing spaces & periods are ignored.
     Original list from https://stackoverflow.com/a/31976060/819417
-    Trailing spaces & periods are ignored on Windows.
     Args:
         filename: The name of the file to repair
-        platform: Host operating system
         substitute: Replacement character for disallowed characters
     Returns:
         Filename with replaced characters
     """
-    if platform == "linux":
-        regex = r"[/\0]|^(?![^.])|[\s]$"
-    elif platform == "darwin":
-        regex = r"[/\0:]|^(?![^.])|[\s]$"
-    else:
-        regex = r"[/\\:|<>\"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$"
+    regex = (
+        r"[/\\:|<>\"?*\0-\x1f]|^(AUX|COM[1-9]|CON|LPT[1-9]|NUL|PRN)(?![^.])|^\s|[\s.]$"
+    )
     return sub(regex, substitute, str(filename), flags=IGNORECASE)
 
 

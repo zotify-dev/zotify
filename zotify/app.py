@@ -8,11 +8,7 @@ from zotify.config import Config
 from zotify.file import TranscodingError
 from zotify.loader import Loader
 from zotify.logger import LogChannel, Logger
-from zotify.utils import (
-    AudioFormat,
-    CollectionType,
-    PlayableType,
-)
+from zotify.utils import AudioFormat, PlayableType
 
 
 class ParseError(ValueError): ...
@@ -32,7 +28,7 @@ class Selection:
     def search(
         self,
         search_text: str,
-        category: list = [
+        category: list[str] = [
             "track",
             "album",
             "artist",
@@ -56,12 +52,13 @@ class Selection:
                 offset=0,
             )
 
+        print(f'Search results for "{search_text}"')
         count = 0
         for cat in categories.split(","):
             label = cat + "s"
             items = resp[label]["items"]
             if len(items) > 0:
-                print(f"\n### {label.capitalize()} ###")
+                print(f"\n{label.capitalize()}:")
                 try:
                     self.__print(count, items, *self.__print_labels[cat])
                 except KeyError:
@@ -109,7 +106,7 @@ class Selection:
 
     def __print(self, count: int, items: list[dict[str, Any]], *args: str) -> None:
         arg_range = range(len(args))
-        category_str = "   " + " ".join("{:<38}" for _ in arg_range)
+        category_str = " # " + " ".join("{:<38}" for _ in arg_range)
         print(category_str.format(*[s.upper() for s in list(args)]))
         for item in items:
             count += 1
@@ -149,30 +146,21 @@ class App:
         self.__config = Config(args)
         Logger(self.__config)
 
-        # Check options
-        if self.__config.audio_format == AudioFormat.VORBIS and (
-            self.__config.ffmpeg_args != "" or self.__config.ffmpeg_path != ""
-        ):
-            Logger.log(
-                LogChannel.WARNINGS,
-                "FFmpeg options will be ignored since no transcoding is required",
-            )
-
         # Create session
         if args.username != "" and args.password != "":
             self.__session = Session.from_userpass(
                 args.username,
                 args.password,
-                self.__config.credentials,
+                self.__config.credentials_path,
                 self.__config.language,
             )
-        elif self.__config.credentials.is_file():
+        elif self.__config.credentials_path.is_file():
             self.__session = Session.from_file(
-                self.__config.credentials, self.__config.language
+                self.__config.credentials_path, self.__config.language
             )
         else:
             self.__session = Session.from_prompt(
-                self.__config.credentials, self.__config.language
+                self.__config.credentials_path, self.__config.language
             )
 
         # Get items to download
@@ -182,6 +170,7 @@ class App:
                 collections = self.parse(ids)
             except ParseError as e:
                 Logger.log(LogChannel.ERRORS, str(e))
+                exit(1)
         if len(collections) > 0:
             self.download_all(collections)
         else:
@@ -208,11 +197,12 @@ class App:
                 return ids
             elif args.urls:
                 return args.urls
-        except (FileNotFoundError, ValueError):
-            Logger.log(LogChannel.WARNINGS, "there is nothing to do")
         except KeyboardInterrupt:
             Logger.log(LogChannel.WARNINGS, "\nthere is nothing to do")
             exit(130)
+        except (FileNotFoundError, ValueError):
+            pass
+        Logger.log(LogChannel.WARNINGS, "there is nothing to do")
         exit(0)
 
     def parse(self, links: list[str]) -> list[Collection]:
@@ -226,28 +216,28 @@ class App:
             except IndexError:
                 raise ParseError(f'Could not parse "{link}"')
 
-            match id_type:
-                case "album":
-                    collections.append(Album(self.__session, _id))
-                case "artist":
-                    collections.append(Artist(self.__session, _id))
-                case "show":
-                    collections.append(Show(self.__session, _id))
-                case "track":
-                    collections.append(Track(self.__session, _id))
-                case "episode":
-                    collections.append(Episode(self.__session, _id))
-                case "playlist":
-                    collections.append(Playlist(self.__session, _id))
-                case _:
-                    raise ParseError(f'Unsupported content type "{id_type}"')
+            collection_types = {
+                "album": Album,
+                "artist": Artist,
+                "show": Show,
+                "track": Track,
+                "episode": Episode,
+                "playlist": Playlist,
+            }
+            try:
+                collections.append(
+                    collection_types[id_type](_id, self.__session.api(), self.__config)
+                )
+            except ValueError:
+                raise ParseError(f'Unsupported content type "{id_type}"')
         return collections
 
     def download_all(self, collections: list[Collection]) -> None:
-        """Downloads playable to local file"""
+        count = 0
+        total = sum(len(c.playables) for c in collections)
         for collection in collections:
-            for i in range(len(collection.playables)):
-                playable = collection.playables[i]
+            for playable in collection.playables:
+                count += 1
 
                 # Get track data
                 if playable.type == PlayableType.TRACK:
@@ -263,43 +253,51 @@ class App:
                         LogChannel.SKIPS,
                         f'Download Error: Unknown playable content "{playable.type}"',
                     )
-                    return
+                    continue
 
                 # Create download location and generate file name
-                match collection.type():
-                    case CollectionType.PLAYLIST:
-                        # TODO: add playlist name to track metadata
-                        library = self.__config.playlist_library
-                        template = (
-                            self.__config.output_playlist_track
-                            if playable.type == PlayableType.TRACK
-                            else self.__config.output_playlist_episode
-                        )
-                    case CollectionType.SHOW | CollectionType.EPISODE:
-                        library = self.__config.podcast_library
-                        template = self.__config.output_podcast
-                    case _:
-                        library = self.__config.music_library
-                        template = self.__config.output_album
-                output = track.create_output(
-                    library, template, self.__config.replace_existing
-                )
+                track.metadata.extend(playable.metadata)
+                try:
+                    output = track.create_output(
+                        playable.library,
+                        playable.output_template,
+                        self.__config.replace_existing,
+                    )
+                except FileExistsError:
+                    Logger.log(
+                        LogChannel.SKIPS,
+                        f'Skipping "{track.name}": Already exists at specified output',
+                    )
 
-                file = track.write_audio_stream(output)
+                # Download track
+                with Logger.progress(
+                    desc=f"({count}/{total}) {track.name}",
+                    total=track.input_stream.size,
+                ) as p_bar:
+                    file = track.write_audio_stream(output, p_bar)
 
                 # Download lyrics
                 if playable.type == PlayableType.TRACK and self.__config.lyrics_file:
-                    with Loader("Fetching lyrics..."):
-                        try:
-                            track.get_lyrics().save(output)
-                        except FileNotFoundError as e:
-                            Logger.log(LogChannel.SKIPS, str(e))
+                    if not self.__session.is_premium():
+                        Logger.log(
+                            LogChannel.SKIPS,
+                            f'Failed to save lyrics for "{track.name}": Lyrics are only available to premium users',
+                        )
+                    else:
+                        with Loader("Fetching lyrics..."):
+                            try:
+                                track.lyrics().save(output)
+                            except FileNotFoundError as e:
+                                Logger.log(LogChannel.SKIPS, str(e))
                 Logger.log(LogChannel.DOWNLOADS, f"\nDownloaded {track.name}")
 
                 # Transcode audio
-                if self.__config.audio_format != AudioFormat.VORBIS:
+                if (
+                    self.__config.audio_format != AudioFormat.VORBIS
+                    or self.__config.ffmpeg_args != ""
+                ):
                     try:
-                        with Loader(LogChannel.PROGRESS, "Converting audio..."):
+                        with Loader("Converting audio..."):
                             file.transcode(
                                 self.__config.audio_format,
                                 self.__config.transcode_bitrate,

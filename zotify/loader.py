@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from itertools import cycle
 from shutil import get_terminal_size
-from sys import platform
+from sys import platform as PLATFORM
 from threading import Thread
 from time import sleep
 
@@ -22,7 +22,7 @@ class Loader:
         pass
     """
 
-    def __init__(self, desc="Loading...", end="", timeout=0.1, mode="std3") -> None:
+    def __init__(self, desc: str = "Loading...", end: str = "", timeout: float = 0.1):
         """
         A loader-like context manager
         Args:
@@ -35,7 +35,8 @@ class Loader:
         self.timeout = timeout
 
         self.__thread = Thread(target=self.__animate, daemon=True)
-        if platform == "win32":
+        # Cool loader looks awful in cmd
+        if PLATFORM == "win32":
             self.steps = ["/", "-", "\\", "|"]
         else:
             self.steps = ["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"]

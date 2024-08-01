@@ -13,6 +13,11 @@ requests = "*"
 tqdm = "*"
 
 [dev-packages]
+black = "*"
+flake8 = "*"
+mypy = "*"
+types-protobuf = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.11"

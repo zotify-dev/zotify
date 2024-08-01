@@ -97,7 +97,7 @@ class Session(LibrespotSession):
             self.__language = language
 
     @staticmethod
-    def from_file(cred_file: Path, language: str = "en") -> Session:
+    def from_file(cred_file: Path | str, language: str = "en") -> Session:
         """
         Creates session using saved credentials file
         Args:
@@ -106,6 +106,8 @@ class Session(LibrespotSession):
         Returns:
             Zotify session
         """
+        if not isinstance(cred_file, Path):
+            cred_file = Path(cred_file).expanduser()
         conf = (
             LibrespotSession.Configuration.Builder()
             .set_store_credentials(False)
@@ -118,7 +120,7 @@ class Session(LibrespotSession):
     def from_userpass(
         username: str,
         password: str,
-        save_file: Path | None = None,
+        save_file: Path | str | None = None,
         language: str = "en",
     ) -> Session:
         """
@@ -133,6 +135,8 @@ class Session(LibrespotSession):
         """
         builder = LibrespotSession.Configuration.Builder()
         if save_file:
+            if not isinstance(save_file, Path):
+                save_file = Path(save_file).expanduser()
             save_file.parent.mkdir(parents=True, exist_ok=True)
             builder.set_stored_credential_file(str(save_file))
         else:
@@ -144,7 +148,9 @@ class Session(LibrespotSession):
         return Session(session, language)
 
     @staticmethod
-    def from_prompt(save_file: Path | None = None, language: str = "en") -> Session:
+    def from_prompt(
+        save_file: Path | str | None = None, language: str = "en"
+    ) -> Session:
         """
         Creates a session with username + password supplied from CLI prompt
         Args:

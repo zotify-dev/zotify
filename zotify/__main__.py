@@ -5,16 +5,15 @@ from pathlib import Path
 
 from zotify.app import App
 from zotify.config import CONFIG_PATHS, CONFIG_VALUES
-from zotify.utils import OptionalOrFalse, SimpleHelpFormatter
+from zotify.utils import OptionalOrFalse
 
-VERSION = "0.9.4"
+VERSION = "0.9.5"
 
 
 def main():
     parser = ArgumentParser(
         prog="zotify",
         description="A fast and customizable music and podcast downloader",
-        formatter_class=SimpleHelpFormatter,
     )
     parser.add_argument(
         "-v",
@@ -53,7 +52,7 @@ def main():
     )
     parser.add_argument("--username", type=str, default="", help="Account username")
     parser.add_argument("--password", type=str, default="", help="Account password")
-    group = parser.add_mutually_exclusive_group(required=False)
+    group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "urls",
         type=str,

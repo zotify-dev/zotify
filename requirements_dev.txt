@@ -1,7 +1,6 @@
 black
 flake8
 mypy
-pre-commit
 types-protobuf
 types-requests
 wheel

@@ -7,14 +7,13 @@ from librespot.metadata import AlbumId
 from librespot.structure import GeneralAudioStream
 from librespot.util import bytes_to_hex
 from requests import get
+from tqdm import tqdm
 
 from zotify.file import LocalFile
-from zotify.logger import Logger
 from zotify.utils import (
     AudioFormat,
     ImageSize,
     MetadataEntry,
-    PlayableType,
     bytes_to_base62,
     fix_filename,
 )
@@ -40,13 +39,15 @@ class Lyrics:
                     f"[{ts_minutes}:{ts_seconds}.{ts_millis}]{line.words}\n"
                 )
 
-    def save(self, path: Path, prefer_synced: bool = True) -> None:
+    def save(self, path: Path | str, prefer_synced: bool = True) -> None:
         """
         Saves lyrics to file
         Args:
             location: path to target lyrics file
             prefer_synced: Use line synced lyrics if available
         """
+        if not isinstance(path, Path):
+            path = Path(path).expanduser()
         if self.__sync_type == "line_synced" and prefer_synced:
             with open(f"{path}.lrc", "w+", encoding="utf-8") as f:
                 f.writelines(self.__lines_synced)
@@ -60,10 +61,12 @@ class Playable:
     input_stream: GeneralAudioStream
     metadata: list[MetadataEntry]
     name: str
-    type: PlayableType
 
     def create_output(
-        self, library: Path = Path("./"), output: str = "{title}", replace: bool = False
+        self,
+        library: Path | str = Path("./"),
+        output: str = "{title}",
+        replace: bool = False,
     ) -> Path:
         """
         Creates save directory for the output file
@@ -74,6 +77,8 @@ class Playable:
         Returns:
             File path for the track
         """
+        if not isinstance(library, Path):
+            library = Path(library)
         for meta in self.metadata:
             if meta.string is not None:
                 output = output.replace(
@@ -87,26 +92,20 @@ class Playable:
             return file_path
 
     def write_audio_stream(
-        self,
-        output: Path,
+        self, output: Path | str, p_bar: tqdm = tqdm(disable=True)
     ) -> LocalFile:
         """
         Writes audio stream to file
         Args:
             output: File path of saved audio stream
+            p_bar: tqdm progress bar
         Returns:
             LocalFile object
         """
+        if not isinstance(output, Path):
+            output = Path(output).expanduser()
         file = f"{output}.ogg"
-        with open(file, "wb") as f, Logger.progress(
-            desc=self.name,
-            total=self.input_stream.size,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            position=0,
-            leave=False,
-        ) as p_bar:
+        with open(file, "wb") as f, p_bar as p_bar:
             chunk = None
             while chunk != b"":
                 chunk = self.input_stream.stream().read(1024)
@@ -127,6 +126,8 @@ class Playable:
 
 
 class Track(PlayableContentFeeder.LoadedStream, Playable):
+    __lyrics: Lyrics
+
     def __init__(self, track: PlayableContentFeeder.LoadedStream, api):
         super(Track, self).__init__(
             track.track,
@@ -135,10 +136,8 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             track.metrics,
         )
         self.__api = api
-        self.__lyrics: Lyrics
         self.cover_images = self.album.cover_group.image
         self.metadata = self.__default_metadata()
-        self.type = PlayableType.TRACK
 
     def __getattr__(self, name):
         try:
@@ -154,7 +153,8 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             )
         return [
             MetadataEntry("album", self.album.name),
-            MetadataEntry("album_artist", [a.name for a in self.album.artist]),
+            MetadataEntry("album_artist", self.album.artist[0].name),
+            MetadataEntry("album_artists", [a.name for a in self.album.artist]),
             MetadataEntry("artist", self.artist[0].name),
             MetadataEntry("artists", [a.name for a in self.artist]),
             MetadataEntry("date", f"{date.year}-{date.month}-{date.day}"),
@@ -180,7 +180,7 @@ class Track(PlayableContentFeeder.LoadedStream, Playable):
             ),
         ]
 
-    def lyrics(self) -> Lyrics:
+    def get_lyrics(self) -> Lyrics:
         """Returns track lyrics if available"""
         if not self.track.has_lyrics:
             raise FileNotFoundError(
@@ -208,7 +208,6 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
         self.__api = api
         self.cover_images = self.episode.cover_image.image
         self.metadata = self.__default_metadata()
-        self.type = PlayableType.EPISODE
 
     def __getattr__(self, name):
         try:
@@ -228,29 +227,26 @@ class Episode(PlayableContentFeeder.LoadedStream, Playable):
             MetadataEntry("title", self.name),
         ]
 
-    def write_audio_stream(self, output: Path) -> LocalFile:
+    def write_audio_stream(
+        self, output: Path | str, p_bar: tqdm = tqdm(disable=True)
+    ) -> LocalFile:
         """
         Writes audio stream to file.
         Uses external source if available for faster download.
         Args:
             output: File path of saved audio stream
+            p_bar: tqdm progress bar
         Returns:
             LocalFile object
         """
+        if not isinstance(output, Path):
+            output = Path(output).expanduser()
         if not bool(self.external_url):
             return super().write_audio_stream(output)
         file = f"{output}.{self.external_url.rsplit('.', 1)[-1]}"
         with get(self.external_url, stream=True) as r, open(
             file, "wb"
-        ) as f, Logger.progress(
-            desc=self.name,
-            total=self.input_stream.size,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            position=0,
-            leave=False,
-        ) as p_bar:
+        ) as f, p_bar as p_bar:
             for chunk in r.iter_content(chunk_size=1024):
                 p_bar.update(f.write(chunk))
         return LocalFile(Path(file))

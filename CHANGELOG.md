@@ -15,9 +15,8 @@
 - Setting `--config` (formerly `--config-location`) can be set to "None" to not use any config file
 - Search result selector now accepts both comma-seperated and hyphen-seperated values at the same time
 - Renamed `--liked`/`-l` to `--liked-tracks`/`-lt`
-- Renamed `root_path` and `root_podcast_path` to `music_library` and `podcast_library`
+- Renamed `root_path` and `root_podcast_path` to `album_library` and `podcast_library`
 - `--username` and `--password` arguments now take priority over saved credentials
-- Regex pattern for cleaning filenames is now OS specific, allowing more usable characters on Linux & macOS.
 - On Linux both `config.json` and `credentials.json` are now kept under `$XDG_CONFIG_HOME/zotify/`, (`~/.config/zotify/` by default).
 - The output template used is now based on track info rather than search result category
 - Search queries with spaces no longer need to be in quotes
@@ -29,7 +28,7 @@
 
 - New library location for playlists `playlist_library`
 - Added new command line arguments
-  - `--library`/`-l` overrides both `music_library` and `podcast_library` options similar to `--output`/`-o`
+  - `--library`/`-l` overrides both `album_library` and `podcast_library` options similar to `--output`/`-o`
   - `--category`/`-c` will limit search results to a certain type, accepted values are "album", "artist", "playlist", "track", "show", "episode". Accepts multiple choices.
   - `--debug` shows full tracebacks on crash instead of just the final error message
   - Added new shorthand aliases to some options:
@@ -55,6 +54,9 @@
   - `{explicit}`
   - `{isrc}`
   - `{licensor}`
+  - `{playlist}`
+  - `{playlist_number}`
+  - `{playlist_owner}`
   - `{popularity}`
   - `{release_date}`
   - `{track_number}`

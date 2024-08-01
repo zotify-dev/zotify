@@ -10,19 +10,20 @@ Built on [Librespot](https://github.com/kokarare1212/librespot-python).
 
 ## Features
 
-- Save tracks at up to 320kbps\*
+- Save tracks at up to 320kbps<sup>**1**</sup>
 - Save to most popular audio formats
 - Built in search
 - Bulk downloads
-- Downloads synced lyrics
+- Downloads synced lyrics<sup>**2**</sup>
 - Embedded metadata
 - Downloads all audio, metadata and lyrics directly, no substituting from other services.
 
-\*Non-premium accounts are limited to 160kbps
+**1**: Non-premium accounts are limited to 160kbps \
+**2**: Requires premium
 
 ## Installation
 
-Requires Python 3.10 or greater. \
+Requires Python 3.11 or greater. \
 Optionally requires FFmpeg to save tracks as anything other than Ogg Vorbis.
 
 Enter the following command in terminal to install Zotify. \
@@ -64,8 +65,6 @@ Downloads specified items. Accepts any combination of track, album, playlist, ep
 | ffmpeg_path             | --ffmpeg-path             | Path to ffmpeg binary                               |                                                            |
 | ffmpeg_args             | --ffmpeg-args             | Additional ffmpeg arguments when transcoding        |                                                            |
 | save_credentials        | --save-credentials        | Save login credentials to a file                    |                                                            |
-| save_subtitles          | --save-subtitles          |
-| save_artist_genres      | --save-arist-genres       |
 
 </details>
 
@@ -104,7 +103,7 @@ file.write_cover_art(track.get_cover_art())
 
 ## Contributing
 
-Pull requests are always welcome, but if adding an entirely new feature we encourage you to create an issue proposing the feature first so we can ensure it's something that fits sthe scope of the project.
+Pull requests are always welcome, but if adding an entirely new feature we encourage you to create an issue proposing the feature first so we can ensure it's something that fits the scope of the project.
 
 Zotify aims to be a comprehensive and user-friendly tool for downloading music and podcasts.
 It is designed to be simple by default but offer a high level of configuration for users that want it.
@@ -112,7 +111,7 @@ All new contributions should follow this principle to keep the program consisten
 
 ## Will my account get banned if I use this tool?
 
-There have been no confirmed cases of accounts getting banned as a result of using Zotify.
+There have been no *confirmed* cases of accounts getting banned as a result of using Zotify.
 However, it is still a possiblity and it is recommended you use Zotify with a burner account where possible.
 
 Consider using [Exportify](https://watsonbox.github.io/exportify/) to keep backups of your playlists.

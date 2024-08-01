@@ -7,18 +7,18 @@ from typing import Any
 
 from zotify.utils import AudioFormat, ImageSize, Quality
 
+ALBUM_LIBRARY = "album_library"
 ALL_ARTISTS = "all_artists"
 ARTWORK_SIZE = "artwork_size"
 AUDIO_FORMAT = "audio_format"
 CREATE_PLAYLIST_FILE = "create_playlist_file"
-CREDENTIALS = "credentials"
+CREDENTIALS_PATH = "credentials_path"
 DOWNLOAD_QUALITY = "download_quality"
 FFMPEG_ARGS = "ffmpeg_args"
 FFMPEG_PATH = "ffmpeg_path"
 LANGUAGE = "language"
 LYRICS_FILE = "lyrics_file"
 LYRICS_ONLY = "lyrics_only"
-MUSIC_LIBRARY = "music_library"
 OUTPUT = "output"
 OUTPUT_ALBUM = "output_album"
 OUTPUT_PLAYLIST_TRACK = "output_playlist_track"
@@ -49,7 +49,7 @@ SYSTEM_PATHS = {
 }
 
 LIBRARY_PATHS = {
-    "music": Path.home().joinpath("Music/Zotify Music"),
+    "album": Path.home().joinpath("Music/Zotify Albums"),
     "podcast": Path.home().joinpath("Music/Zotify Podcasts"),
     "playlist": Path.home().joinpath("Music/Zotify Playlists"),
 }
@@ -68,7 +68,7 @@ OUTPUT_PATHS = {
 }
 
 CONFIG_VALUES = {
-    CREDENTIALS: {
+    CREDENTIALS_PATH: {
         "default": CONFIG_PATHS["creds"],
         "type": Path,
         "args": ["--credentials"],
@@ -80,11 +80,11 @@ CONFIG_VALUES = {
         "args": ["--archive"],
         "help": "Path to track archive file",
     },
-    MUSIC_LIBRARY: {
-        "default": LIBRARY_PATHS["music"],
+    ALBUM_LIBRARY: {
+        "default": LIBRARY_PATHS["album"],
         "type": Path,
-        "args": ["--music-library"],
-        "help": "Path to root of music library",
+        "args": ["--album-library"],
+        "help": "Path to root of album library",
     },
     PODCAST_LIBRARY: {
         "default": LIBRARY_PATHS["podcast"],
@@ -138,8 +138,8 @@ CONFIG_VALUES = {
     },
     AUDIO_FORMAT: {
         "default": "vorbis",
-        "type": AudioFormat,
-        "choices": [n.value.name for n in AudioFormat],
+        "type": AudioFormat.from_string,
+        "choices": list(AudioFormat),
         "args": ["--audio-format"],
         "help": "Audio format of final track output",
     },
@@ -256,13 +256,13 @@ CONFIG_VALUES = {
 
 class Config:
     __config_file: Path | None
+    album_library: Path
     artwork_size: ImageSize
     audio_format: AudioFormat
-    credentials: Path
+    credentials_path: Path
     download_quality: Quality
     ffmpeg_args: str
     ffmpeg_path: str
-    music_library: Path
     language: str
     lyrics_file: bool
     output_album: str
@@ -276,9 +276,9 @@ class Config:
     save_metadata: bool
     transcode_bitrate: int
 
-    def __init__(self, args: Namespace = Namespace()):
+    def __init__(self, args: Namespace | None = None):
         jsonvalues = {}
-        if args.config:
+        if args is not None and args.config:
             self.__config_file = Path(args.config)
             # Valid config file found
             if self.__config_file.exists():
@@ -300,7 +300,7 @@ class Config:
 
         for key in CONFIG_VALUES:
             # Override config with commandline arguments
-            if key in vars(args) and vars(args)[key] is not None:
+            if args is not None and key in vars(args) and vars(args)[key] is not None:
                 setattr(self, key, self.__parse_arg_value(key, vars(args)[key]))
             # If no command option specified use config
             elif key in jsonvalues:
@@ -314,14 +314,13 @@ class Config:
                 )
 
         # "library" arg overrides all *_library options
-        if args.library:
-            print("args.library")
-            self.music_library = Path(args.library).expanduser().resolve()
+        if args is not None and args.library:
+            self.album_library = Path(args.library).expanduser().resolve()
             self.playlist_library = Path(args.library).expanduser().resolve()
             self.podcast_library = Path(args.library).expanduser().resolve()
 
         # "output" arg overrides all output_* options
-        if args.output:
+        if args is not None and args.output:
             self.output_album = args.output
             self.output_podcast = args.output
             self.output_playlist_track = args.output
@@ -334,8 +333,8 @@ class Config:
             return value
         elif config_type == Path:
             return Path(value).expanduser().resolve()
-        elif config_type == AudioFormat:
-            return AudioFormat[value.upper()]
+        elif config_type == AudioFormat.from_string:
+            return AudioFormat.from_string(value)
         elif config_type == ImageSize.from_string:
             return ImageSize.from_string(value)
         elif config_type == Quality.from_string:
