@@ -114,6 +114,6 @@ EXT_MAP = {
     'm4a': 'm4a',
     'mp3': 'mp3',
     'ogg': 'ogg',
-    'opus': 'opus',
+    'opus': 'ogg',
     'vorbis': 'ogg',
 }

@@ -19,7 +19,6 @@ from zotify.zotify import Zotify
 class MusicFormat(str, Enum):
     MP3 = 'mp3',
     OGG = 'ogg',
-    OPUS = 'opus'
 
 
 def create_download_directory(download_path: str) -> None:
